@@ -10,8 +10,7 @@ import retrofit2.http.Path;
 
 interface GitHubService {
     @GET("Features/{id}")
-    Call<List<Feature>> repoContributors(
-            @Path("id") int id);
+    Call<Feature> repoContributors(@Path("id") int id);
 
 
     public static final Retrofit retrofit = new Retrofit.Builder()

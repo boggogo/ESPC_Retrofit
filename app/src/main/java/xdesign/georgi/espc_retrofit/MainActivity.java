@@ -31,25 +31,29 @@ public class MainActivity extends AppCompatActivity {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                GitHubService gitHubService = GitHubService.retrofit.create(GitHubService.class);
-                final Call<List<Feature>> call =
-                        gitHubService.repoContributors(173);
 
-                call.enqueue(new Callback<List<Feature>>() {
+
+                GitHubService gitHubService = GitHubService.retrofit.create(GitHubService.class);
+
+
+                final Call<Feature> call = gitHubService.repoContributors(173);
+
+                call.enqueue(new Callback<Feature>() {
                     @Override
-                    public void onResponse(Call<List<Feature>> call, Response<List<Feature>> response) {
+                    public void onResponse(Call<Feature> call, Response<Feature> response) {
                         Log.e("MainActivity","onResponce");
                         final TextView textView = (TextView) findViewById(R.id.textView);
-
-
                         textView.setText(response.body().toString());
                     }
+
                     @Override
-                    public void onFailure(Call<List<Feature>> call, Throwable t) {
-                        Log.e("MainActivity","onFailure");
+                    public void onFailure(Call<Feature> call, Throwable t) {
+                        Log.e("MainActivity","onFailure" + t.toString());
                         final TextView textView = (TextView) findViewById(R.id.textView);
                         textView.setText("Something went wrong: " + t.getMessage());
                     }
+
+
                 });
             }
         });
