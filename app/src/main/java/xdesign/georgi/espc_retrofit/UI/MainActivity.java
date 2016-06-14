@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -27,17 +28,18 @@ import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = MainActivity.class.getSimpleName();
     private ESPCService espcService;
     private ArrayList<Property> mProperties = new ArrayList<>();
 
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
-
+//    UI References
     private RecyclerView mRecyclerView;
     private PropertyAdapter mAdapter;
     private FloatingActionButton AddNewPropertyFAB;
+    private SwipeRefreshLayout mRefreshLayout;
 
     //    private TextView textView;
     @Override
@@ -46,10 +48,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        mRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
+        mRefreshLayout.setOnRefreshListener(this);
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mPreferences.edit();
 
+//         Check if the user is logged in
         if(!mPreferences.getBoolean(Constants.IS_USER_LOGGED_IN,false)){
             Log.d(TAG,"User is NOT logged in");
             // no logged user => transfer the user to the log in page
@@ -65,9 +70,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         espcService = ESPCService.retrofit.create(ESPCService.class);
 
-        Call<List<Property>> call = espcService.getAllProperties();
-
-        call.enqueue(this);
+        refetchDataFromBackend();
 
         // set up AddNewPropertyFAB button
         AddNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
@@ -87,6 +90,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private void refetchDataFromBackend() {
+        Call<List<Property>> call = espcService.getAllProperties();
+        call.enqueue(this);
+    }
+
     @Override
     public void onClick(View v) {
         // Add new property
@@ -95,11 +103,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
         Log.e("MainActivity", "onResponse");
-        for (Property p : response.body()) {
-            mProperties.add(p);
-        }
-
+        mProperties.addAll(response.body());
         mAdapter.notifyDataSetChanged();
+        mRefreshLayout.setRefreshing(false);
     }
 
     @Override
@@ -134,6 +140,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onRefresh() {
+        mProperties.clear();
+        refetchDataFromBackend();
     }
 
 
