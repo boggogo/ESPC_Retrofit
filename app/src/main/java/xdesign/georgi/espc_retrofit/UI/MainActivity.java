@@ -48,6 +48,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        Log.e(TAG,"onCreate - MainActivity");
+
+
         mRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
 

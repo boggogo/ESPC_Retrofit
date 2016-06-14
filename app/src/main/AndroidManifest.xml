@@ -11,6 +11,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
+            android:launchMode="singleTop"
             android:name=".UI.MainActivity"
             android:label="@string/property_activity"
             android:theme="@style/AppTheme.NoActionBar">
@@ -27,7 +28,8 @@
             android:name=".UI.PropertyDetailsActivity"
             android:label="@string/title_activity_property_details"
             android:parentActivityName=".UI.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
+            android:theme="@style/AppTheme.NoActionBar"
+            android:launchMode="singleTop">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="xdesign.georgi.espc_retrofit.UI.MainActivity" />

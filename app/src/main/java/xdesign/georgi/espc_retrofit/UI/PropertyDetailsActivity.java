@@ -21,6 +21,8 @@ public class PropertyDetailsActivity extends AppCompatActivity {
         setContentView(R.layout.activity_property_details);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setDisplayShowHomeEnabled(true);
 
 //        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
 //        fab.setOnClickListener(new View.OnClickListener() {
@@ -33,10 +35,9 @@ public class PropertyDetailsActivity extends AppCompatActivity {
 //        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         Bundle data = getIntent().getExtras();
-
         Property property = (Property) data.getSerializable(Constants.KEY_PROPERTY_OBJECT);
-
-        Log.d(TAG,property.toString());
+        getSupportActionBar().setTitle(property.getAddress());
+//        Log.d(TAG, property.toString());
     }
 
 }
