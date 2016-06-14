@@ -1,31 +1,33 @@
 package xdesign.georgi.espc_retrofit;
 
-public class Feature {
+import java.math.BigInteger;
 
-    String name;
-    int roomID;
+class Feature {
+        private int id;
+        private String name;
+        private int roomID;
 
-    public String getName() {
-        return name;
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public int getRoomID() {
+            return roomID;
+        }
+
+        public void setRoomID(int roomID) {
+            this.roomID = roomID;
+        }
+
+        @Override
+        public String toString() {
+            return "Feature{" +
+                    "name='" + name + '\'' +
+                    ", roomID=" + roomID +
+                    '}';
+        }
     }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public int getRoomID() {
-        return roomID;
-    }
-
-    public void setRoomID(int roomID) {
-        this.roomID = roomID;
-    }
-
-    @Override
-    public String toString() {
-        return "Feature{" +
-                "name='" + name + '\'' +
-                ", roomID=" + roomID +
-                '}';
-    }
-}

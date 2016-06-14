@@ -8,16 +8,28 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.AdapterView;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
 
-public class MainActivity extends AppCompatActivity {
-//    private TextView textView;
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, AdapterView.OnItemClickListener {
+    private static final String TAG = MainActivity.class.getSimpleName();
+    private ESPCService espcService;
+    private ArrayList<Property> mProperties = new ArrayList<>();
+
+    private ListView mListView;
+    private PropertyAdapter mAdapter;
+    private FloatingActionButton AddNewPropertyFAB;
+
+    //    private TextView textView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,63 +37,47 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        espcService = ESPCService.retrofit.create(ESPCService.class);
 
+        Call<List<Property>> call = espcService.getAllProperties();
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        call.enqueue(this);
 
+        // set up AddNewPropertyFAB button
+        AddNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
+        if (AddNewPropertyFAB != null)
+            AddNewPropertyFAB.setOnClickListener(this);
 
-                GitHubService gitHubService = GitHubService.retrofit.create(GitHubService.class);
+        mAdapter = new PropertyAdapter(this, R.layout.property_list_item, mProperties);
+        mListView = (ListView) findViewById(R.id.listView);
 
+        mListView.setAdapter(mAdapter);
 
-                final Call<Feature> call = gitHubService.repoContributors(173);
-
-                call.enqueue(new Callback<Feature>() {
-                    @Override
-                    public void onResponse(Call<Feature> call, Response<Feature> response) {
-                        Log.e("MainActivity","onResponce");
-                        final TextView textView = (TextView) findViewById(R.id.textView);
-                        textView.setText(response.body().toString());
-                    }
-
-                    @Override
-                    public void onFailure(Call<Feature> call, Throwable t) {
-                        Log.e("MainActivity","onFailure" + t.toString());
-                        final TextView textView = (TextView) findViewById(R.id.textView);
-                        textView.setText("Something went wrong: " + t.getMessage());
-                    }
-
-
-                });
-            }
-        });
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        mListView.setOnItemClickListener(this);
 
 
     }
+
+    @Override
+    public void onClick(View v) {
+        // Add new property
+    }
+
+    @Override
+    public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
+        Log.e("MainActivity", "onResponse");
+        for (Property p : response.body()) {
+            mProperties.add(p);
+        }
+
+        mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onFailure(Call<List<Property>> call, Throwable t) {
+        Log.e("MainActivity", "onFailure");
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,5 +99,11 @@ public class MainActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+
+    @Override
+    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        Log.d(TAG,"Selected Item: " + id);
     }
 }
