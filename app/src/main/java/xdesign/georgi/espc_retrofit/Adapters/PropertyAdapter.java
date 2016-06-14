@@ -1,5 +1,8 @@
 package xdesign.georgi.espc_retrofit.Adapters;
 
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,18 +14,20 @@ import java.util.List;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.R;
+import xdesign.georgi.espc_retrofit.UI.PropertyDetailsActivity;
+import xdesign.georgi.espc_retrofit.Utils.Constants;
 
 /**
  * Created by georgi on 14/06/16.
  */
 public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.PropertyViewHolder> {
-    private static final String TAG = PropertyAdapter_NOT_USED.class.getSimpleName();
-    private List<Property> mProperties;
-    //private Context mContext;
+    private static final String TAG = PropertyAdapter.class.getSimpleName();
+    private static List<Property> mProperties;
+    public static Context mContext;
 
-    public PropertyAdapter(List<Property> mProperties) {
+    public PropertyAdapter(Context mContext ,List<Property> mProperties) {
         this.mProperties = mProperties;
-        //this.mContext = mContext;
+        this.mContext = mContext;
     }
 
     @Override
@@ -57,6 +62,14 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
         @Override
         public void onClick(View v) {
             Log.d(TAG, "Clicked view: " + getAdapterPosition());
+            Intent intent = new Intent(mContext, PropertyDetailsActivity.class);
+
+            Bundle bundle = new Bundle();
+
+            bundle.putSerializable(Constants.KEY_PROPERTY_OBJECT,mProperties.get(getAdapterPosition()));
+
+            intent.putExtras(bundle);
+            mContext.startActivity(intent);
         }
     }
 

@@ -18,4 +18,5 @@
     <string name="action_log_out">Log Out</string>
     <string name="property_activity">Properties</string>
     <string name="log_in_activity">Log in</string>
+    <string name="title_activity_property_details">PropertyDetailsActivity</string>
 </resources>

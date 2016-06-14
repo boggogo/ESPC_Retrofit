@@ -1,11 +1,12 @@
 package xdesign.georgi.espc_retrofit.Backend;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 
 /**
  * Created by georgi on 14/06/16.
  */
-public class Property {
+public class Property implements Serializable{
 
     private int id;
     private String address;
@@ -38,5 +39,14 @@ public class Property {
 
     public void setPrice(double price) {
         this.price = price;
+    }
+
+    @Override
+    public String toString() {
+        return "Property{" +
+                "id=" + id +
+                ", address='" + address + '\'' +
+                ", price=" + price +
+                '}';
     }
 }

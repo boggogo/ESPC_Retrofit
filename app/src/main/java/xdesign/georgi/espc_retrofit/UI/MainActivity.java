@@ -74,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (AddNewPropertyFAB != null)
             AddNewPropertyFAB.setOnClickListener(this);
 
-        mAdapter = new PropertyAdapter(mProperties);
+        mAdapter = new PropertyAdapter(this,mProperties);
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.listView);
