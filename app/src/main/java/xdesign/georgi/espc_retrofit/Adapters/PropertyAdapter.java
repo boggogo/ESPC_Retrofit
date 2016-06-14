@@ -1,13 +1,12 @@
 package xdesign.georgi.espc_retrofit.Adapters;
 
-import android.content.Context;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
 import android.widget.TextView;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import xdesign.georgi.espc_retrofit.Property;
@@ -16,49 +15,49 @@ import xdesign.georgi.espc_retrofit.R;
 /**
  * Created by georgi on 14/06/16.
  */
-public class PropertyAdapter extends ArrayAdapter<Property> {
-    private static final String TAG = PropertyAdapter.class.getSimpleName();
+public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.PropertyViewHolder> {
+    private static final String TAG = PropertyAdapter_NOT_USED.class.getSimpleName();
     private List<Property> mProperties;
-    private Context mContext;
+    //private Context mContext;
 
-
-    public PropertyAdapter(Context context, int layoutResourceId, ArrayList<Property> properties) {
-        super(context, layoutResourceId, properties);
-        mProperties = properties;
-        mContext = context;
+    public PropertyAdapter(List<Property> mProperties) {
+        this.mProperties = mProperties;
+        //this.mContext = mContext;
     }
-
 
     @Override
-    public View getView(int position, View convertView, ViewGroup parent) {
-       final ViewHolder holder;
+    public PropertyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.property_list_item, parent, false);
+        return new PropertyViewHolder(view);
+    }
 
-        if(convertView == null){
-            convertView = LayoutInflater.from(mContext).inflate(R.layout.property_list_item,null);
-            holder = new ViewHolder();
-            holder.propertyAddress = (TextView)convertView.findViewById(R.id.address);
-            holder.propertyPrice = (TextView)convertView.findViewById(R.id.price);
-
-            convertView.setTag(holder);
-        }else {
-            holder = (ViewHolder) convertView.getTag();
-        }
-
+    @Override
+    public void onBindViewHolder(PropertyViewHolder holder, int position) {
         Property property = mProperties.get(position);
-
         holder.propertyAddress.setText(property.getAddress());
         holder.propertyPrice.setText(property.getPrice()+"");
+    }
 
-
-        return convertView;
+    @Override
+    public int getItemCount() {
+        return mProperties.size();
     }
 
 
+    public static class PropertyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
+        TextView propertyAddress, propertyPrice;
 
+        public PropertyViewHolder(View view) {
+            super(view);
+            propertyAddress = (TextView)view.findViewById(R.id.address);
+            propertyPrice = (TextView)view.findViewById(R.id.price);
+            view.setOnClickListener(this);
+        }
 
-
-    private static class ViewHolder {
-        TextView propertyAddress;
-        TextView propertyPrice;
+        @Override
+        public void onClick(View v) {
+            Log.d(TAG, "Clicked view: " + getAdapterPosition());
+        }
     }
+
 }

@@ -5,4 +5,5 @@
     <color name="listItemColor">#6d86a1</color>
     <color name="colorAccent">#FF4081</color>
     <color name="green">#6d9711</color>
+    <color name="grey">#747474</color>
 </resources>

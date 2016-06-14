@@ -3,14 +3,13 @@ package xdesign.georgi.espc_retrofit;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.AdapterView;
-import android.widget.ListView;
-import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,13 +18,14 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
+import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, AdapterView.OnItemClickListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>{
     private static final String TAG = MainActivity.class.getSimpleName();
     private ESPCService espcService;
     private ArrayList<Property> mProperties = new ArrayList<>();
 
-    private ListView mListView;
+    private RecyclerView mRecyclerView;
     private PropertyAdapter mAdapter;
     private FloatingActionButton AddNewPropertyFAB;
 
@@ -48,12 +48,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (AddNewPropertyFAB != null)
             AddNewPropertyFAB.setOnClickListener(this);
 
-        mAdapter = new PropertyAdapter(this, R.layout.property_list_item, mProperties);
-        mListView = (ListView) findViewById(R.id.listView);
+        mAdapter = new PropertyAdapter(mProperties);
 
-        mListView.setAdapter(mAdapter);
 
-        mListView.setOnItemClickListener(this);
+        mRecyclerView = (RecyclerView) findViewById(R.id.listView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, null));
+        mRecyclerView.setAdapter(mAdapter);
+
+
 
 
     }
@@ -102,8 +105,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
 
-    @Override
-    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Log.d(TAG,"Selected Item: " + id);
-    }
+//    @Override
+//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//        Log.d(TAG,"Selected Item: " + id);
+//    }
 }
