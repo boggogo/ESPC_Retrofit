@@ -1,10 +1,14 @@
 package xdesign.georgi.espc_retrofit.UI;
 
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -14,6 +18,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,22 +29,23 @@ import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.R;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyDialogFragment;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = MainActivity.class.getSimpleName();
-    private ESPCService espcService;
-    private ArrayList<Property> mProperties = new ArrayList<>();
+    private static ESPCService espcService;
+    private static ArrayList<Property> mProperties = new ArrayList<>();
 
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
 //    UI References
     private RecyclerView mRecyclerView;
-    private PropertyAdapter mAdapter;
-    private FloatingActionButton AddNewPropertyFAB;
-    private SwipeRefreshLayout mRefreshLayout;
+    private static PropertyAdapter mAdapter;
+    private FloatingActionButton addNewPropertyFAB;
+    private static SwipeRefreshLayout mRefreshLayout;
 
     //    private TextView textView;
     @Override
@@ -76,10 +82,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         refetchDataFromBackend();
 
-        // set up AddNewPropertyFAB button
-        AddNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
-        if (AddNewPropertyFAB != null)
-            AddNewPropertyFAB.setOnClickListener(this);
+        setUpFabButton();
+
 
         mAdapter = new PropertyAdapter(this,mProperties);
 
@@ -94,6 +98,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    private void setUpFabButton() {
+        // set up addNewPropertyFAB button
+        addNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
+        // Change the color of the fab icon to white...
+        Drawable fabDrawable = addNewPropertyFAB.getDrawable();
+        DrawableCompat.setTint(fabDrawable, Color.WHITE);
+        // set up the onClickListener...
+        if (addNewPropertyFAB != null)
+            addNewPropertyFAB.setOnClickListener(this);
+    }
+
     private void refetchDataFromBackend() {
         Call<List<Property>> call = espcService.getAllProperties();
         call.enqueue(this);
@@ -102,11 +117,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         // Add new property
+        AddNewPropertyDialogFragment addNewFragment = AddNewPropertyDialogFragment.newInstance("Add Property","Create another property");
+        addNewFragment.show(getFragmentManager(),getString(R.string.add_new_property_dialog_tag));
     }
 
     @Override
     public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-        Log.e("MainActivity", "onResponse");
+        Log.e(TAG, "onResponse");
         mProperties.addAll(response.body());
         mAdapter.notifyDataSetChanged();
         mRefreshLayout.setRefreshing(false);
@@ -114,7 +131,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onFailure(Call<List<Property>> call, Throwable t) {
-        Log.e("MainActivity", "onFailure");
+        Log.e(TAG, "onFailure");
     }
 
 
@@ -150,6 +167,35 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRefresh() {
         mProperties.clear();
         refetchDataFromBackend();
+    }
+
+    public static void onPositiveAddNewProperty(String address, String price, final Context context) {
+        Log.d(TAG,"onPositiveAddNewProperty: address: " + address + " Price: "+price);
+        // set up the new property...
+        Property newProperty = new Property();
+        newProperty.setAddress(address);
+        newProperty.setPrice(price);
+        // start refreshing...
+        mRefreshLayout.setRefreshing(true);
+        // add the new property locally first...
+        mProperties.add(newProperty);
+        mAdapter.notifyDataSetChanged();
+        // save the new property to the backend...
+        espcService.addNewProperty(newProperty).enqueue(new Callback<Property>() {
+            @Override
+            public void onResponse(Call<Property> call, Response<Property> response) {
+                mRefreshLayout.setRefreshing(false);
+                Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
+                Toast.makeText(context,"Successfully added new property", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<Property> call, Throwable t) {
+                mRefreshLayout.setRefreshing(false);
+                Log.e(TAG, "onFailure: error: " + t.toString());
+            }
+        });
+
     }
 
 

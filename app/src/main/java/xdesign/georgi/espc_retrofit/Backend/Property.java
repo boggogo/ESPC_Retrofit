@@ -10,7 +10,7 @@ public class Property implements Serializable{
 
     private int id;
     private String address;
-    private double price;
+    private String price;
 
     public Property() {
         this.id = 0;
@@ -33,11 +33,11 @@ public class Property implements Serializable{
         this.address = address;
     }
 
-    public double getPrice() {
+    public String getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(String price) {
         this.price = price;
     }
 

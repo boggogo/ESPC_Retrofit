@@ -19,4 +19,7 @@
     <string name="property_activity">Properties</string>
     <string name="log_in_activity">Log in</string>
     <string name="title_activity_property_details">PropertyDetailsActivity</string>
+    <string name="prompt_add_property_address">Address</string>
+    <string name="prompt_add_property_price">Price</string>
+    <string name="add_new_property_dialog_tag">add_new_property_dialog_tag</string>
 </resources>
