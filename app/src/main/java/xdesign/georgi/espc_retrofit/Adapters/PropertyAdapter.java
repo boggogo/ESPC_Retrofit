@@ -9,7 +9,7 @@ import android.widget.TextView;
 
 import java.util.List;
 
-import xdesign.georgi.espc_retrofit.Property;
+import xdesign.georgi.espc_retrofit.Utils.Property;
 import xdesign.georgi.espc_retrofit.R;
 
 /**

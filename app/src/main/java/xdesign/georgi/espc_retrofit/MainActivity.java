@@ -1,6 +1,9 @@
 package xdesign.georgi.espc_retrofit;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,12 +21,17 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
+import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
+import xdesign.georgi.espc_retrofit.Utils.Property;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>{
     private static final String TAG = MainActivity.class.getSimpleName();
     private ESPCService espcService;
     private ArrayList<Property> mProperties = new ArrayList<>();
+
+    private SharedPreferences mPreferences;
+    private SharedPreferences.Editor mEditor;
 
     private RecyclerView mRecyclerView;
     private PropertyAdapter mAdapter;
@@ -36,6 +44,22 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mEditor = mPreferences.edit();
+
+        if(!mPreferences.getBoolean(Constants.IS_USER_LOGGED_IN,false)){
+            Log.d(TAG,"User is NOT logged in");
+            // no logged user => transfer the user to the log in page
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
+        }else {
+            // user is logged in
+            Log.d(TAG,"User is logged in");
+        }
+
 
         espcService = ESPCService.retrofit.create(ESPCService.class);
 
@@ -97,7 +121,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_log_out) {
+            mEditor.putBoolean(Constants.IS_USER_LOGGED_IN,false).apply();
+
+            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+            startActivity(intent);
             return true;
         }
 
