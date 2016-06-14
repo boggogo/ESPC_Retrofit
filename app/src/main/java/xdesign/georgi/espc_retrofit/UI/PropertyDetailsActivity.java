@@ -37,7 +37,7 @@ public class PropertyDetailsActivity extends AppCompatActivity {
         Bundle data = getIntent().getExtras();
         Property property = (Property) data.getSerializable(Constants.KEY_PROPERTY_OBJECT);
         getSupportActionBar().setTitle(property.getAddress());
-//        Log.d(TAG, property.toString());
+        Log.d(TAG, property.toString());
     }
 
 }

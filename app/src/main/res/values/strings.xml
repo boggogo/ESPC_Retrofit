@@ -22,4 +22,6 @@
     <string name="prompt_add_property_address">Address</string>
     <string name="prompt_add_property_price">Price</string>
     <string name="add_new_property_dialog_tag">add_new_property_dialog_tag</string>
+    <string name="property_contextual_delete">Delete</string>
+    <string name="property_contextual_update">Update</string>
 </resources>

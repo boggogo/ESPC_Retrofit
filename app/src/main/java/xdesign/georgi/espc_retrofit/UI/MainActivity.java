@@ -34,14 +34,14 @@ import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, SwipeRefreshLayout.OnRefreshListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, SwipeRefreshLayout.OnRefreshListener {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
     private static ArrayList<Property> mProperties = new ArrayList<>();
 
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
-//    UI References
+    //    UI References
     private RecyclerView mRecyclerView;
     private static PropertyAdapter mAdapter;
     private FloatingActionButton addNewPropertyFAB;
@@ -55,26 +55,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        Log.e(TAG,"onCreate - MainActivity");
+        Log.e(TAG, "onCreate - MainActivity");
 
 
-        mRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
+        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mPreferences.edit();
 
 //         Check if the user is logged in
-        if(!mPreferences.getBoolean(Constants.IS_USER_LOGGED_IN,false)){
-            Log.d(TAG,"User is NOT logged in");
+        if (!mPreferences.getBoolean(Constants.IS_USER_LOGGED_IN, false)) {
+            Log.d(TAG, "User is NOT logged in");
             // no logged user => transfer the user to the log in page
-            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
-        }else {
+        } else {
             // user is logged in
-            Log.d(TAG,"User is logged in");
+            Log.d(TAG, "User is logged in");
         }
 
 
@@ -85,15 +85,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setUpFabButton();
 
 
-        mAdapter = new PropertyAdapter(this,mProperties);
+        mAdapter = new PropertyAdapter(this, mProperties);
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.listView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, null));
         mRecyclerView.setAdapter(mAdapter);
-
-
 
 
     }
@@ -117,8 +115,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         // Add new property
-        AddNewPropertyDialogFragment addNewFragment = AddNewPropertyDialogFragment.newInstance("Add Property","Create another property");
-        addNewFragment.show(getFragmentManager(),getString(R.string.add_new_property_dialog_tag));
+        AddNewPropertyDialogFragment addNewFragment = AddNewPropertyDialogFragment.newInstance("Add Property", "Create another property");
+        addNewFragment.show(getFragmentManager(), getString(R.string.add_new_property_dialog_tag));
     }
 
     @Override
@@ -151,9 +149,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //noinspection SimplifiableIfStatement
         if (id == R.id.action_log_out) {
-            mEditor.putBoolean(Constants.IS_USER_LOGGED_IN,false).apply();
+            mEditor.putBoolean(Constants.IS_USER_LOGGED_IN, false).apply();
 
-            Intent intent = new Intent(MainActivity.this,LoginActivity.class);
+            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
             startActivity(intent);
@@ -170,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public static void onPositiveAddNewProperty(String address, String price, final Context context) {
-        Log.d(TAG,"onPositiveAddNewProperty: address: " + address + " Price: "+price);
+        Log.d(TAG, "onPositiveAddNewProperty: address: " + address + " Price: " + price);
         // set up the new property...
         Property newProperty = new Property();
         newProperty.setAddress(address);
@@ -186,7 +184,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call<Property> call, Response<Property> response) {
                 mRefreshLayout.setRefreshing(false);
                 Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
-                Toast.makeText(context,"Successfully added new property", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Successfully added new property", Toast.LENGTH_SHORT).show();
             }
 
 

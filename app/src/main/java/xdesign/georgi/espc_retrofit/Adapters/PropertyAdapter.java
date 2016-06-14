@@ -14,6 +14,7 @@ import java.util.List;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.R;
+import xdesign.georgi.espc_retrofit.UI.MainActivity;
 import xdesign.georgi.espc_retrofit.UI.PropertyDetailsActivity;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 
