@@ -189,6 +189,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Toast.makeText(context,"Successfully added new property", Toast.LENGTH_SHORT).show();
             }
 
+
             @Override
             public void onFailure(Call<Property> call, Throwable t) {
                 mRefreshLayout.setRefreshing(false);
