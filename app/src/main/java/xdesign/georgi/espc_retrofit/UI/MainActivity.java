@@ -1,4 +1,4 @@
-package xdesign.georgi.espc_retrofit;
+package xdesign.georgi.espc_retrofit.UI;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -21,9 +21,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
+import xdesign.georgi.espc_retrofit.Backend.ESPCService;
+import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
-import xdesign.georgi.espc_retrofit.Utils.Property;
+import xdesign.georgi.espc_retrofit.Backend.Property;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>{
     private static final String TAG = MainActivity.class.getSimpleName();

@@ -1,4 +1,4 @@
-package xdesign.georgi.espc_retrofit;
+package xdesign.georgi.espc_retrofit.Backend;
 
 import java.util.List;
 
@@ -8,10 +8,8 @@ import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
 import retrofit2.http.Query;
-import xdesign.georgi.espc_retrofit.Utils.Property;
-import xdesign.georgi.espc_retrofit.Utils.User_ESPC;
 
-interface ESPCService {
+public interface ESPCService {
     /***
      * Method to get a feature by id
      *

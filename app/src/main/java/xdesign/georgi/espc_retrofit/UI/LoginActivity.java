@@ -1,4 +1,4 @@
-package xdesign.georgi.espc_retrofit;
+package xdesign.georgi.espc_retrofit.UI;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,8 +12,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +19,10 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import xdesign.georgi.espc_retrofit.Backend.ESPCService;
+import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
-import xdesign.georgi.espc_retrofit.Utils.User_ESPC;
+import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
 
 /**
  * A login screen that offers login via email/password.
