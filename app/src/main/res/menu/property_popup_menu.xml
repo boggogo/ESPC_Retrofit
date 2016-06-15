@@ -1,11 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
-    <item
-        android:id="@+id/contextual_deleteProperty"
-        android:title="@string/property_contextual_delete"></item>
 
     <item
-        android:id="@+id/contextual_updateProperty"
-        android:title="@string/property_contextual_update"></item>
+        android:id="@+id/popup_showRatingOfProperty"
+        android:title="@string/property_popup_update"></item>
+
+    <item
+        android:id="@+id/popup_deleteProperty"
+        android:title="@string/property_popup_delete"></item>
+
+    <item
+        android:id="@+id/popup_updateProperty"
+        android:title="@string/property_popup_update"></item>
 
 </menu>

@@ -96,7 +96,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
         @Override
         public boolean onMenuItemClick(MenuItem item) {
             switch (item.getItemId()) {
-                case R.id.contextual_deleteProperty:
+                case R.id.popup_deleteProperty:
                     //....
                     Log.d(TAG," delete pop up menu Item clicked. Property index: " + propertyPosition);
 //                    mParant.onPositiveDeletePropertyById(mProperties.get(propertyPosition));
@@ -106,7 +106,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                     dialog.show(mParant.getFragmentManager(),mParant.getString(R.string.conf_delete_property_dialog_tag));
 
                     return true;
-                case R.id.contextual_updateProperty:
+                case R.id.popup_updateProperty:
                     //....
                     Log.d(TAG," update pop up menu Item clicked. Property index: " + propertyPosition);
                     UpdatePropertyDialog updateDialog = UpdatePropertyDialog.newInstance(propertyPosition
