@@ -9,12 +9,16 @@ import java.math.BigInteger;
 public class Property implements Serializable{
 
     private int id;
+    private int userID;
     private String address;
     private String price;
 
-    public Property() {
-        this.id = 0;
+    public int getUserID() {
+        return userID;
+    }
 
+    public void setUserID(int userID) {
+        this.userID = userID;
     }
 
     public int getId() {

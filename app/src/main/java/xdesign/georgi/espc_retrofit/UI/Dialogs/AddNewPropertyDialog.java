@@ -25,6 +25,8 @@ public class AddNewPropertyDialog extends DialogFragment {
     private String mTitle;
     // String message variable to hold the dialog message
     private String mMessage;
+    // keep track of the parent
+    private MainActivity mParent;
 
     public static AddNewPropertyDialog newInstance(String title, String message){
         AddNewPropertyDialog fragment = new AddNewPropertyDialog();
@@ -41,7 +43,7 @@ public class AddNewPropertyDialog extends DialogFragment {
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         mTitle = getArguments().getString(DIALOG_TITLE);
         mMessage = getArguments().getString(DIALOG_MESSAGE);
-
+        mParent = (MainActivity) getActivity();
         final View add_property_layout = LayoutInflater.from(getActivity()).inflate(R.layout.add_property_details_dialog_layout,null);
 
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
@@ -59,7 +61,7 @@ public class AddNewPropertyDialog extends DialogFragment {
                         String address = addressEditText.getText().toString().trim();
                         String price = priceEditText.getText().toString().trim();
 
-                        MainActivity.onPositiveAddNewProperty(address,price, getActivity());
+                        mParent.onPositiveAddNewProperty(address,price, getActivity());
                     }
                 })
                 .setNegativeButton("Cancel", null);

@@ -50,11 +50,19 @@ public class UpdatePropertyDialog extends DialogFragment {
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
         final View add_property_layout = LayoutInflater.from(getActivity()).inflate(R.layout.add_property_details_dialog_layout,null);
+        final EditText addressEditText = (EditText) add_property_layout.findViewById(R.id.address);
+        final EditText priceEditText =  (EditText) add_property_layout.findViewById(R.id.price);
+
+
 
         mTitle = getArguments().getString(DIALOG_TITLE);
         mMessage = getArguments().getString(DIALOG_MESSAGE);
         mParent = getActivity();
         propertyToBeUpdatedIndex = getArguments().getInt(DIALOG_DELETING_PROPERTY_INDEX);
+
+
+        addressEditText.setText(((MainActivity) (mParent)).mProperties.get(propertyToBeUpdatedIndex).getAddress());
+        priceEditText.setText(((MainActivity) (mParent)).mProperties.get(propertyToBeUpdatedIndex).getPrice());
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder
                 .setTitle(mTitle)
@@ -64,8 +72,7 @@ public class UpdatePropertyDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Add new Property here...
-                        EditText addressEditText = (EditText) add_property_layout.findViewById(R.id.address);
-                        EditText priceEditText =  (EditText) add_property_layout.findViewById(R.id.price);
+
 
                         String address = addressEditText.getText().toString().trim();
                         String price = priceEditText.getText().toString().trim();

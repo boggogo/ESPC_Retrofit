@@ -29,12 +29,12 @@ import xdesign.georgi.espc_retrofit.Utils.Constants;
 public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.PropertyViewHolder> {
     private static final String TAG = PropertyAdapter.class.getSimpleName();
     private static List<Property> mProperties;
-    public static MainActivity mParant;
+    public static MainActivity mParent;
     public static int propertyPosition;
 
     public PropertyAdapter(MainActivity activity, List<Property> mProperties) {
         this.mProperties = mProperties;
-        this.mParant = activity;
+        this.mParent = activity;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    PopupMenu popupMenu = new PopupMenu(mParant, v);
+                    PopupMenu popupMenu = new PopupMenu(mParent, v);
                     MenuInflater inflater = popupMenu.getMenuInflater();
                     inflater.inflate(R.menu.property_popup_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(PropertyViewHolder.this);
@@ -84,14 +84,14 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
         @Override
         public void onClick(View v) {
             Log.d(TAG, "Clicked view: " + getAdapterPosition());
-            Intent intent = new Intent(mParant, PropertyDetailsActivity.class);
+            Intent intent = new Intent(mParent, PropertyDetailsActivity.class);
 
             Bundle bundle = new Bundle();
 
             bundle.putSerializable(Constants.KEY_PROPERTY_OBJECT, mProperties.get(getAdapterPosition()));
 
             intent.putExtras(bundle);
-            mParant.startActivity(intent);
+            mParent.startActivity(intent);
         }
 
         @Override
@@ -100,29 +100,29 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                 case R.id.popup_deleteProperty:
                     //....
                     Log.d(TAG," delete pop up menu Item clicked. Property index: " + propertyPosition);
-//                    mParant.onPositiveDeletePropertyById(mProperties.get(propertyPosition));
+//                    mParent.onPositiveDeletePropertyById(mProperties.get(propertyPosition));
                     ConfDelPropertyDialog dialog = ConfDelPropertyDialog.newInstance(mProperties.get(propertyPosition)
-                            ,mParant.getString(R.string.conf_delete_property_dialog_title)
-                            ,mParant.getString(R.string.conf_delete_property_dialog_message));
-                    dialog.show(mParant.getFragmentManager(),mParant.getString(R.string.conf_delete_property_dialog_tag));
+                            , mParent.getString(R.string.conf_delete_property_dialog_title)
+                            , mParent.getString(R.string.conf_delete_property_dialog_message));
+                    dialog.show(mParent.getFragmentManager(), mParent.getString(R.string.conf_delete_property_dialog_tag));
 
                     return true;
                 case R.id.popup_updateProperty:
                     //....
                     Log.d(TAG," update pop up menu Item clicked. Property index: " + propertyPosition);
                     UpdatePropertyDialog updateDialog = UpdatePropertyDialog.newInstance(propertyPosition
-                    ,mParant.getString(R.string.update_property_dialog_title),mParant.getString(R.string.update_property_dialog_message));
-                    updateDialog.show(mParant.getFragmentManager(),mParant.getString(R.string.update_property_dialog_tag));
+                    , mParent.getString(R.string.update_property_dialog_title), mParent.getString(R.string.update_property_dialog_message));
+                    updateDialog.show(mParent.getFragmentManager(), mParent.getString(R.string.update_property_dialog_tag));
                     return true;
 
                 case R.id.popup_showRatingOfProperty:
                     // Show ratings of this property
-                    Intent ratingsIntent = new Intent(mParant, RatingsActivity.class);
+                    Intent ratingsIntent = new Intent(mParent, RatingsActivity.class);
                     //put necessary data into the intent's bundle here
 
                     // save the clicked property's id in the bundle...
                     ratingsIntent.putExtra(Constants.KEY_PROPERTY_ID,mProperties.get(propertyPosition).getId());
-                    mParant.startActivity(ratingsIntent);
+                    mParent.startActivity(ratingsIntent);
 
                 default:
                     return false;

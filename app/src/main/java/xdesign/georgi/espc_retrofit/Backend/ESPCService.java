@@ -40,6 +40,9 @@ public interface ESPCService {
     @GET("Properties")
     Call<List<Property>> getAllProperties();
 
+    @GET("Properties")
+    Call<List<Property>> getAllPropertiesAssociatedWithUserId(@Query("filter[where][userID]=") int userID);
+
     // Add new property
     @POST("Properties")
     Call<Property> addNewProperty(@Body Property property);

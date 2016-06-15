@@ -31,6 +31,7 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
+import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -42,7 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
-    private static ArrayList<Property> mProperties = new ArrayList<>();
+    public static ArrayList<Property> mProperties = new ArrayList<>();
+
+//    private ArrayList<UserPropertyRating> mUserPropertyRatings = new ArrayList<>();
 
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static PropertyAdapter mAdapter;
     private FloatingActionButton addNewPropertyFAB;
     private static SwipeRefreshLayout mRefreshLayout;
+    private static int userId = -1;
 
     //    private TextView textView;
     @Override
@@ -79,13 +83,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         } else {
             // user is logged in
-            Log.d(TAG, "User with id: " + mPreferences.getInt(Constants.USER_ID_KEY, -1) + " is logged in");
+            userId = mPreferences.getInt(Constants.USER_ID_KEY, -1);
+            Log.d(TAG, "User with id: " + userId + " is logged in");
         }
 
 
         espcService = ESPCService.retrofit.create(ESPCService.class);
 
-        refetchDataFromBackend();
+        refetchPropertiesFromBackend();
 
         setUpFabButton();
 
@@ -119,10 +124,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             addNewPropertyFAB.setOnClickListener(this);
     }
 
-    private void refetchDataFromBackend() {
+    private void refetchPropertiesFromBackend() {
         mProperties.clear();
         Call<List<Property>> call = espcService.getAllProperties();
         call.enqueue(this);
+    }
+
+    private void refetchThisUserPropertiesFromBackend(){
+        mProperties.clear();
+        espcService.getAllPropertiesAssociatedWithUserId(userId).enqueue(this);
     }
 
     @Override
@@ -134,7 +144,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-        Log.e(TAG, "onResponse");
+        Log.e(TAG, "onResponse. Success: " + response.isSuccessful());
         mProperties.addAll(response.body());
         mAdapter.notifyDataSetChanged();
         mRefreshLayout.setRefreshing(false);
@@ -170,33 +180,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
             return true;
         }
+        
+        if(id == R.id.action_show_my_properties){
+            refetchThisUserPropertiesFromBackend();
+        }
 
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onRefresh() {
-        refetchDataFromBackend();
+        refetchPropertiesFromBackend();
     }
 
-    public static void onPositiveAddNewProperty(String address, String price, final Context context) {
+    public void onPositiveAddNewProperty(String address, String price, final Context context) {
         Log.d(TAG, "onPositiveAddNewProperty: address: " + address + " Price: " + price);
         // set up the new property...
-        Property newProperty = new Property();
+        final Property newProperty = new Property();
         newProperty.setAddress(address);
         newProperty.setPrice(price);
+        newProperty.setUserID(userId);
         // start refreshing...
         mRefreshLayout.setRefreshing(true);
-        // add the new property locally first...
-        mProperties.add(newProperty);
+
         mAdapter.notifyDataSetChanged();
         // save the new property to the backend...
         espcService.addNewProperty(newProperty).enqueue(new Callback<Property>() {
             @Override
             public void onResponse(Call<Property> call, Response<Property> response) {
-                mRefreshLayout.setRefreshing(false);
-                Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
-                Toast.makeText(context, "Successfully added new property", Toast.LENGTH_SHORT).show();
+
+                if(response.isSuccessful() || response.body() == null) {
+                    // add the new property locally first...
+                    mProperties.add(newProperty);
+                    mRefreshLayout.setRefreshing(false);
+                    Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
+                    Toast.makeText(context, "Successfully added new property", Toast.LENGTH_SHORT).show();
+                }else {
+                    showErrorToast(getString(R.string.error_add_new_property_toast_message));
+                }
             }
 
 
@@ -204,49 +225,56 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onFailure(Call<Property> call, Throwable t) {
                 mRefreshLayout.setRefreshing(false);
                 Log.e(TAG, "onFailure: error: " + t.toString());
+                showErrorToast(getString(R.string.error_add_new_property_toast_message));
             }
         });
 
     }
 
     public void onPositiveDeletePropertyById(final Property property) {
-        Call<HashMap<String, Integer>> call = espcService.deletePropertyById(property.getId());
-        call.enqueue(new Callback<HashMap<String, Integer>>() {
-            @Override
-            public void onResponse(Call<HashMap<String, Integer>> call, Response<HashMap<String, Integer>> response) {
-                Log.e(TAG, "onResponse: Delete property Success: " + response.isSuccessful());
-                // Check if the delete was successful
-                if (response.isSuccessful()) {
-                    Log.d(TAG, "Delete property HashMap size: " + response.body().size());
-                    // Upon successful deletion the body will be a HashMap(String, Integer) with size 1 - count:value
-                    int count = 0;
-                    HashMap<String, Integer> hm = response.body();
-                    Iterator iterator = hm.entrySet().iterator();
-                    while(iterator.hasNext()){
-                        Map.Entry pair = (Map.Entry) iterator.next();
-                        count = (int) pair.getValue();
-                        Log.d(TAG,"Iterator: " + pair.toString());
-                        Log.d(TAG,"count:" + pair.getValue());
-                    }
-                    if(count == 1) {
-                        // success = > delete the local item from the list
-                        mProperties.remove(property);
-                        mAdapter.notifyDataSetChanged();
-                    }else {
-                        // deletion failed
+        // Check if the user can delete this property - e.g. the user addded it
+        if(property.getUserID() == userId) {
+            Call<HashMap<String, Integer>> call = espcService.deletePropertyById(property.getId());
+            call.enqueue(new Callback<HashMap<String, Integer>>() {
+                @Override
+                public void onResponse(Call<HashMap<String, Integer>> call, Response<HashMap<String, Integer>> response) {
+                    Log.e(TAG, "onResponse: Delete property Success: " + response.isSuccessful());
+                    // Check if the delete was successful
+                    if (response.isSuccessful()) {
+                        Log.d(TAG, "Delete property HashMap size: " + response.body().size());
+                        // Upon successful deletion the body will be a HashMap(String, Integer) with size 1 - count:value
+                        int count = 0;
+                        HashMap<String, Integer> hm = response.body();
+                        Iterator iterator = hm.entrySet().iterator();
+                        while (iterator.hasNext()) {
+                            Map.Entry pair = (Map.Entry) iterator.next();
+                            count = (int) pair.getValue();
+                            Log.d(TAG, "Iterator: " + pair.toString());
+                            Log.d(TAG, "count:" + pair.getValue());
+                        }
+                        if (count == 1) {
+                            // success = > delete the local item from the list
+                            mProperties.remove(property);
+                            mAdapter.notifyDataSetChanged();
+                        } else {
+                            // deletion failed
+                            showErrorToast(getString(R.string.toast_error_message_delete_property));
+                        }
+
+                    } else {
                         showErrorToast(getString(R.string.toast_error_message_delete_property));
                     }
-
-                } else {
-                    showErrorToast(getString(R.string.toast_error_message_delete_property));
                 }
-            }
 
-            @Override
-            public void onFailure(Call<HashMap<String, Integer>> call, Throwable t) {
-                Log.e(TAG, "onFailure: Delete property " + t.toString());
-            }
-        });
+                @Override
+                public void onFailure(Call<HashMap<String, Integer>> call, Throwable t) {
+                    Log.e(TAG, "onFailure: Delete property " + t.toString());
+                }
+            });
+        }else{
+            // cant delete this property
+            showErrorToast(getString(R.string.error_show_toast_cant_delete_prop));
+        }
     }
 
     private void showErrorToast(String errorMessage) {
@@ -263,41 +291,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         newProp.setAddress(newPropAddress);
         newProp.setPrice(newPropPrice);
         newProp.setId(oldProp.getId());
+        newProp.setUserID(userId);
 
-        // get the property id that will be updated in the backend
-        Call<Property> call = espcService.updatePropertyById(mProperties.get(propertyToBeUpdatedIndex).getId(), newProp);
-        call.enqueue(new Callback<Property>() {
-            @Override
-            public void onResponse(Call<Property> call, Response<Property> response) {
+        if(mProperties.get(propertyToBeUpdatedIndex).getUserID() == userId) {
+            // get the property id that will be updated in the backend
+            Call<Property> call = espcService.updatePropertyById(mProperties.get(propertyToBeUpdatedIndex).getId(), newProp);
+            call.enqueue(new Callback<Property>() {
+                @Override
+                public void onResponse(Call<Property> call, Response<Property> response) {
 //                Log.d(TAG,"onResponse update property success: " + response.isSuccessful() + "Details: " + response.errorBody().toString());
 
-                if(response.isSuccessful()){
+                    if (response.isSuccessful()) {
 
-                    if(response.body().getId() == oldProp.getId()) {
+                        if (response.body().getId() == oldProp.getId()) {
 
-                        Log.d(TAG, "Update Property response Body: " + response.body().toString());
-                        mProperties.set(propertyToBeUpdatedIndex, newProp);
-                        mAdapter.notifyDataSetChanged();
-                    }else{
+                            Log.d(TAG, "Update Property response Body: " + response.body().toString());
+                            mProperties.set(propertyToBeUpdatedIndex, newProp);
+                            mAdapter.notifyDataSetChanged();
+                        } else {
+                            showErrorToast(getString(R.string.toast_error_message_update_property));
+                        }
+
+                    } else {
                         showErrorToast(getString(R.string.toast_error_message_update_property));
                     }
 
-                }else{
-                    showErrorToast(getString(R.string.toast_error_message_update_property));
                 }
 
-            }
-
-            @Override
-            public void onFailure(Call<Property> call, Throwable t) {
-                Log.e(TAG,"Update Property failed" + t.toString());
-            }
-        });
+                @Override
+                public void onFailure(Call<Property> call, Throwable t) {
+                    Log.e(TAG, "Update Property failed" + t.toString());
+                }
+            });
+        }else{
+            showErrorToast(getString(R.string.error_show_toast_cant_update_prop));
+        }
     }
 
 
-//    @Override
-//    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//        Log.d(TAG,"Selected Item: " + id);
-//    }
+
 }
