@@ -20,6 +20,7 @@ import xdesign.georgi.espc_retrofit.UI.Dialogs.ConfDelPropertyDialog;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.UpdatePropertyDialog;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 import xdesign.georgi.espc_retrofit.UI.PropertyDetailsActivity;
+import xdesign.georgi.espc_retrofit.UI.RatingsActivity;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 
 /**
@@ -116,7 +117,10 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
 
                 case R.id.popup_showRatingOfProperty:
                     // Show ratings of this property
+                    Intent ratingsIntent = new Intent(mParant, RatingsActivity.class);
+                    //put necessary data into the intent's bundle here
 
+                    mParant.startActivity(ratingsIntent);
 
                 default:
                     return false;

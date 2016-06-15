@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         } else {
             // user is logged in
-            Log.d(TAG, mPreferences.getString(Constants.USER_NAME_KEY,"user") + " is logged in");
+            Log.d(TAG, "User with id: " + mPreferences.getInt(Constants.USER_ID_KEY, -1) + " is logged in");
         }
 
 
@@ -101,6 +101,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG,"List size: " + mProperties.size());
+//        mAdapter.notifyDataSetChanged();
+    }
+
     private void setUpFabButton() {
         // set up addNewPropertyFAB button
         addNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
@@ -113,6 +120,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void refetchDataFromBackend() {
+        mProperties.clear();
         Call<List<Property>> call = espcService.getAllProperties();
         call.enqueue(this);
     }
@@ -168,7 +176,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onRefresh() {
-        mProperties.clear();
         refetchDataFromBackend();
     }
 

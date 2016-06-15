@@ -8,5 +8,5 @@ public class Constants {
 
     public static final String KEY_PROPERTY_OBJECT = "property_object_key";
 
-    public static final String USER_NAME_KEY = "user_name_key";
+    public static final String USER_ID_KEY = "user_id_key";
 }

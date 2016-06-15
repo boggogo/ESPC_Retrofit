@@ -33,4 +33,5 @@
     <string name="update_property_dialog_message">Set the new Details of this property</string>
     <string name="update_property_dialog_tag">update_property_dialog_tag</string>
     <string name="property_popup_rating">Show ratings</string>
+    <string name="title_activity_ratings">RatingsActivity</string>
 </resources>

@@ -11,9 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:launchMode="singleTop"
             android:name=".UI.MainActivity"
             android:label="@string/property_activity"
+            android:launchMode="singleTop"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -23,13 +23,22 @@
         </activity>
         <activity
             android:name=".UI.LoginActivity"
-            android:label="@string/log_in_activity"></activity>
+            android:label="@string/log_in_activity" />
         <activity
             android:name=".UI.PropertyDetailsActivity"
             android:label="@string/title_activity_property_details"
+            android:launchMode="singleTop"
             android:parentActivityName=".UI.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar"
-            android:launchMode="singleTop">
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value="xdesign.georgi.espc_retrofit.UI.MainActivity" />
+        </activity>
+        <activity
+            android:name=".UI.RatingsActivity"
+            android:label="@string/title_activity_ratings"
+            android:parentActivityName=".UI.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="xdesign.georgi.espc_retrofit.UI.MainActivity" />
