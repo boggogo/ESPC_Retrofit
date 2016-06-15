@@ -18,6 +18,7 @@ import retrofit2.http.Query;
 
 public interface ESPCService {
     //=============================================== Feature Methods =============================================
+
     /***
      * Method to get a feature by id
      *
@@ -32,34 +33,35 @@ public interface ESPCService {
      *
      * @return List of features
      */
-    @GET ("Features/{}")
+    @GET("Features/{}")
     Call<List<Feature>> getAllFeatures();
 
-//=============================================== Property Methods =============================================
-    @GET ("Properties")
+    //=============================================== Property Methods =============================================
+    @GET("Properties")
     Call<List<Property>> getAllProperties();
 
     // Add new property
     @POST("Properties")
     Call<Property> addNewProperty(@Body Property property);
 
-    @DELETE ("Properties/{id}")
+    @DELETE("Properties/{id}")
     Call<HashMap<String, Integer>> deletePropertyById(@Path("id") int id);
 
-    @PUT ("Properties/{id}")
-    Call<Property> updatePropertyById (@Path("id") int id, @Body Property property);
+    @PUT("Properties/{id}")
+    Call<Property> updatePropertyById(@Path("id") int id, @Body Property property);
 
     //=============================================== User Methods =============================================
-    @GET ("User_ESPCs")
+    @GET("User_ESPCs")
     Call<List<User_ESPC>> getAllUsers();
 
     //http://localhost:3000/api/User_ESPCs?filter[where][name]=admin
-    @GET ("User_ESPCs")
+    @GET("User_ESPCs")
     Call<List<User_ESPC>> getUserByNameAndPass(@Query("filter[where][name]=") String name, @Query("filter[where][password]=") String password);
 
 
-
-
+    //=============================================== Room Methods =============================================
+    @GET("Rooms")
+    Call<List<Room>> getAllRoomsAssociatedWithPropertyID(@Query("filter[where][propertyID]=") int propertyID);
 
     //=============================================== Backend Base URL =============================================
     public static final Retrofit retrofit = new Retrofit.Builder()
