@@ -102,8 +102,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                     //....
                     Log.d(TAG," delete pop up menu Item clicked. Property index: " + propertyPosition);
 //                    mParant.onPositiveDeletePropertyById(mProperties.get(propertyPosition));
-                    ConfDelPropertyDialog dialog = ConfDelPropertyDialog.newInstance(mParant
-                            ,mProperties.get(propertyPosition)
+                    ConfDelPropertyDialog dialog = ConfDelPropertyDialog.newInstance(mProperties.get(propertyPosition)
                             ,mParant.getString(R.string.conf_delete_property_dialog_title)
                             ,mParant.getString(R.string.conf_delete_property_dialog_message));
                     dialog.show(mParant.getFragmentManager(),mParant.getString(R.string.conf_delete_property_dialog_tag));

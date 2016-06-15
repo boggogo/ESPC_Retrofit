@@ -23,7 +23,9 @@ import android.widget.Toast;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -38,7 +40,7 @@ import xdesign.georgi.espc_retrofit.Backend.Property;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         Callback<List<Property>>,
-        SwipeRefreshLayout.OnRefreshListener, Serializable{
+        SwipeRefreshLayout.OnRefreshListener, Serializable {
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
     private static ArrayList<Property> mProperties = new ArrayList<>();
@@ -208,18 +210,28 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onResponse(Call<HashMap<String, Integer>> call, Response<HashMap<String, Integer>> response) {
                 Log.e(TAG, "onResponse: Delete property Success: " + response.isSuccessful());
                 // Check if the delete was successful
-                if(response.isSuccessful()){
-                    Log.d(TAG,"Delete property HashMap size: " + response.body().size());
-                    // Upon successful deletion the body will be a HashMap with size 1
-                    if(response.body().size() == 1) {
+                if (response.isSuccessful()) {
+                    Log.d(TAG, "Delete property HashMap size: " + response.body().size());
+                    // Upon successful deletion the body will be a HashMap(String, Integer) with size 1 - count:value
+                    int count = 0;
+                    HashMap<String, Integer> hm = response.body();
+                    Iterator iterator = hm.entrySet().iterator();
+                    while(iterator.hasNext()){
+                        Map.Entry pair = (Map.Entry) iterator.next();
+                        count = (int) pair.getValue();
+                        Log.d(TAG,"Iterator: " + pair.toString());
+                        Log.d(TAG,"count:" + pair.getValue());
+                    }
+                    if(count == 1) {
                         // success = > delete the local item from the list
                         mProperties.remove(property);
                         mAdapter.notifyDataSetChanged();
-                    }else{
+                    }else {
                         // deletion failed
                         showDeletionFailedToast();
                     }
-                }else {
+
+                } else {
                     showDeletionFailedToast();
                 }
             }
@@ -232,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void showDeletionFailedToast() {
-        Toast.makeText(MainActivity.this,"Delete failed. Please try again.", Toast.LENGTH_LONG).show();
+        Toast.makeText(MainActivity.this, "Delete failed. Please try again.", Toast.LENGTH_LONG).show();
     }
 
 
