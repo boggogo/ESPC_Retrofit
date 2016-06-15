@@ -44,17 +44,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
     public static ArrayList<Property> mProperties = new ArrayList<>();
-
-//    private ArrayList<UserPropertyRating> mUserPropertyRatings = new ArrayList<>();
-
+    private static int userId = -1;
+    private static PropertyAdapter mAdapter;
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
+
     //    UI References
     private RecyclerView mRecyclerView;
-    private static PropertyAdapter mAdapter;
     private FloatingActionButton addNewPropertyFAB;
     private static SwipeRefreshLayout mRefreshLayout;
-    private static int userId = -1;
+
 
     //    private TextView textView;
     @Override

@@ -72,6 +72,8 @@ public interface ESPCService {
     @GET("UserPropertyRatings")
     Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithUserId(@Query(("filter[where][userID]=")) int userID);
 
+    @POST ("UserPropertyRatings")
+    Call<UserPropertyRating> addNewRating(@Body UserPropertyRating userPropertyRating);
 
     //=============================================== Backend Base URL =============================================
     public static final Retrofit retrofit = new Retrofit.Builder()
