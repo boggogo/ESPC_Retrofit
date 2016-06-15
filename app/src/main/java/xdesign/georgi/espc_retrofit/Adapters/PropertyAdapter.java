@@ -1,14 +1,11 @@
 package xdesign.georgi.espc_retrofit.Adapters;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
-import android.view.ActionMode;
 import android.view.LayoutInflater;
-import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -71,7 +68,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                 public boolean onLongClick(View v) {
                     PopupMenu popupMenu = new PopupMenu(mParant, v);
                     MenuInflater inflater = popupMenu.getMenuInflater();
-                    inflater.inflate(R.menu.property_contextual_menu, popupMenu.getMenu());
+                    inflater.inflate(R.menu.property_popup_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(PropertyViewHolder.this);
 
                     // save the position of the item that was long pressed...
