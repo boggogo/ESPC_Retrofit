@@ -120,6 +120,8 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                     Intent ratingsIntent = new Intent(mParant, RatingsActivity.class);
                     //put necessary data into the intent's bundle here
 
+                    // save the clicked property's id in the bundle...
+                    ratingsIntent.putExtra(Constants.KEY_PROPERTY_ID,mProperties.get(propertyPosition).getId());
                     mParant.startActivity(ratingsIntent);
 
                 default:

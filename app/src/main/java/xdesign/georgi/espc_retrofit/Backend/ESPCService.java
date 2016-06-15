@@ -63,6 +63,13 @@ public interface ESPCService {
     @GET("Rooms")
     Call<List<Room>> getAllRoomsAssociatedWithPropertyID(@Query("filter[where][propertyID]=") int propertyID);
 
+
+
+    //=============================================== UserPropertyRating Methods =============================================
+    @GET("UserPropertyRatings")
+    Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithUserId(@Query(("filter[where][userID]=")) int userID);
+
+
     //=============================================== Backend Base URL =============================================
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://10.0.2.2:3000/api/")

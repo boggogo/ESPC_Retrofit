@@ -1,0 +1,43 @@
+package xdesign.georgi.espc_retrofit.Backend;
+
+/**
+ * Created by georgi on 15/06/16.
+ */
+public class UserPropertyRating {
+    private int userID;
+    private int propertyID;
+    private int overallRating;
+
+    public int getUserID() {
+        return userID;
+    }
+
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+
+    public int getPropertyID() {
+        return propertyID;
+    }
+
+    public void setPropertyID(int propertyID) {
+        this.propertyID = propertyID;
+    }
+
+    public int getOverallRating() {
+        return overallRating;
+    }
+
+    public void setOverallRating(int overallRating) {
+        this.overallRating = overallRating;
+    }
+
+    @Override
+    public String toString() {
+        return "UserPropertyRating{" +
+                "userID=" + userID +
+                ", propertyID=" + propertyID +
+                ", overallRating=" + overallRating +
+                '}';
+    }
+}
