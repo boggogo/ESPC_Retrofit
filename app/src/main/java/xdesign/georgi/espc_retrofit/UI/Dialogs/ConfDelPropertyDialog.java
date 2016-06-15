@@ -61,7 +61,7 @@ public class ConfDelPropertyDialog extends DialogFragment {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Add new Property here...
-                        ((MainActivity) (mParent)).deletePropertyById(propertyToDelete);
+                        ((MainActivity) (mParent)).onPositiveDeletePropertyById(propertyToDelete);
                     }
                 })
                 .setNegativeButton("Cancel", null);

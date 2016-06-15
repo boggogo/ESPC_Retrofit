@@ -101,12 +101,12 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                 case R.id.contextual_deleteProperty:
                     //....
                     Log.d(TAG," delete pop up menu Item clicked. Property index: " + propertyPosition);
-//                    mParant.deletePropertyById(mProperties.get(propertyPosition));
+//                    mParant.onPositiveDeletePropertyById(mProperties.get(propertyPosition));
                     ConfDelPropertyDialog dialog = ConfDelPropertyDialog.newInstance(mParant
                             ,mProperties.get(propertyPosition)
-                            ,"Delete Property"
-                            ,"Are you sure that you want to delete this property?");
-                    dialog.show(mParant.getFragmentManager(),"confirm_delete_property_dialog_tag");
+                            ,mParant.getString(R.string.conf_delete_property_dialog_title)
+                            ,mParant.getString(R.string.conf_delete_property_dialog_message));
+                    dialog.show(mParant.getFragmentManager(),mParant.getString(R.string.conf_delete_property_dialog_tag));
 
                     return true;
                 case R.id.contextual_updateProperty:

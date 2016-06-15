@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
-    public void deletePropertyById(final Property property) {
+    public void onPositiveDeletePropertyById(final Property property) {
         Call<HashMap<String, Integer>> call = espcService.deletePropertyById(property.getId());
         call.enqueue(new Callback<HashMap<String, Integer>>() {
             @Override
@@ -209,11 +209,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e(TAG, "onResponse: Delete property Success: " + response.isSuccessful());
                 // Check if the delete was successful
                 if(response.isSuccessful()){
-                    // success = > delete the local item from the list
-                    mProperties.remove(property);
-                    mAdapter.notifyDataSetChanged();
+                    Log.d(TAG,"Delete property HashMap size: " + response.body().size());
+                    // Upon successful deletion the body will be a HashMap with size 1
+                    if(response.body().size() == 1) {
+                        // success = > delete the local item from the list
+                        mProperties.remove(property);
+                        mAdapter.notifyDataSetChanged();
+                    }else{
+                        // deletion failed
+                        showDeletionFailedToast();
+                    }
                 }else {
-                    Toast.makeText(MainActivity.this,"Delete failed. Please try again.", Toast.LENGTH_LONG).show();
+                    showDeletionFailedToast();
                 }
             }
 
@@ -222,6 +229,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e(TAG, "onFailure: Delete property " + t.toString());
             }
         });
+    }
+
+    private void showDeletionFailedToast() {
+        Toast.makeText(MainActivity.this,"Delete failed. Please try again.", Toast.LENGTH_LONG).show();
     }
 
 
