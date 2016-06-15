@@ -113,8 +113,8 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                     //....
                     Log.d(TAG," update pop up menu Item clicked. Property index: " + propertyPosition);
                     UpdatePropertyDialog updateDialog = UpdatePropertyDialog.newInstance(propertyPosition
-                    ,"Update Property details","Set the new Details of this property");
-                    updateDialog.show(mParant.getFragmentManager(),"update_property_dialog_tag");
+                    ,mParant.getString(R.string.update_property_dialog_title),mParant.getString(R.string.update_property_dialog_message));
+                    updateDialog.show(mParant.getFragmentManager(),mParant.getString(R.string.update_property_dialog_tag));
                     return true;
 
                 default:

@@ -29,4 +29,7 @@
     <string name="conf_delete_property_dialog_message">Are you sure that you want to delete this property?</string>
     <string name="toast_error_message_delete_property">Delete failed. Please try again.</string>
     <string name="toast_error_message_update_property">Error! Property details not updated.</string>
+    <string name="update_property_dialog_title">Update Property details</string>
+    <string name="update_property_dialog_message">Set the new Details of this property</string>
+    <string name="update_property_dialog_tag">update_property_dialog_tag</string>
 </resources>

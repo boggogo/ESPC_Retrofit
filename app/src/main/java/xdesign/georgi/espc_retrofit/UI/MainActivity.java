@@ -249,7 +249,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onPositiveUpdatePropertyDetails(final int propertyToBeUpdatedIndex, String newPropAddress, String newPropPrice) {
 
         Log.d(TAG,"Property to be updated id: " + mProperties.get(propertyToBeUpdatedIndex).toString());
-        Property oldProp = mProperties.get(propertyToBeUpdatedIndex);
+        final Property oldProp = mProperties.get(propertyToBeUpdatedIndex);
 
 
         final Property newProp = new Property();
@@ -265,9 +265,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                Log.d(TAG,"onResponse update property success: " + response.isSuccessful() + "Details: " + response.errorBody().toString());
 
                 if(response.isSuccessful()){
-                    Log.d(TAG,"Update Property response Body: " + response.body().toString());
-                    mProperties.set(propertyToBeUpdatedIndex,newProp);
-                    mAdapter.notifyDataSetChanged();
+
+                    if(response.body().getId() == oldProp.getId()) {
+
+                        Log.d(TAG, "Update Property response Body: " + response.body().toString());
+                        mProperties.set(propertyToBeUpdatedIndex, newProp);
+                        mAdapter.notifyDataSetChanged();
+                    }else{
+                        showErrorToast(getString(R.string.toast_error_message_update_property));
+                    }
 
                 }else{
                     showErrorToast(getString(R.string.toast_error_message_update_property));
