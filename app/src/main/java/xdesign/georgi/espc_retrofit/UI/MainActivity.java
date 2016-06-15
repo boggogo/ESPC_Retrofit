@@ -15,13 +15,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.ActionMode;
-import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -32,12 +31,14 @@ import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.R;
-import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyDialogFragment;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, SwipeRefreshLayout.OnRefreshListener{
+public class MainActivity extends AppCompatActivity implements View.OnClickListener,
+        Callback<List<Property>>,
+        SwipeRefreshLayout.OnRefreshListener, Serializable{
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
     private static ArrayList<Property> mProperties = new ArrayList<>();
@@ -118,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onClick(View v) {
         // Add new property
-        AddNewPropertyDialogFragment addNewFragment = AddNewPropertyDialogFragment.newInstance("Add Property", "Create another property");
+        AddNewPropertyDialog addNewFragment = AddNewPropertyDialog.newInstance("Add Property", "Create another property");
         addNewFragment.show(getFragmentManager(), getString(R.string.add_new_property_dialog_tag));
     }
 

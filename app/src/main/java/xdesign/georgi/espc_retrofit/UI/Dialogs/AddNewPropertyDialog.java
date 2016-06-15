@@ -15,8 +15,8 @@ import xdesign.georgi.espc_retrofit.UI.MainActivity;
 /**
  * Created by georgi on 14/06/16.
  */
-public class AddNewPropertyDialogFragment extends DialogFragment {
-    private String TAG = AddNewPropertyDialogFragment.class.getSimpleName().toString();
+public class AddNewPropertyDialog extends DialogFragment {
+    private String TAG = AddNewPropertyDialog.class.getSimpleName().toString();
     // Title key value
     private static final String DIALOG_TITLE = "alert_dialog_title";
     // Message key value
@@ -26,8 +26,8 @@ public class AddNewPropertyDialogFragment extends DialogFragment {
     // String message variable to hold the dialog message
     private String mMessage;
 
-    public static AddNewPropertyDialogFragment newInstance(String title, String message){
-        AddNewPropertyDialogFragment fragment = new AddNewPropertyDialogFragment();
+    public static AddNewPropertyDialog newInstance(String title, String message){
+        AddNewPropertyDialog fragment = new AddNewPropertyDialog();
         Bundle args = new Bundle();
         args.putString(DIALOG_TITLE,title);
         args.putString(DIALOG_MESSAGE,message);

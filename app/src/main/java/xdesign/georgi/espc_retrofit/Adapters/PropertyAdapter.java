@@ -19,6 +19,7 @@ import java.util.List;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.R;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.ConfDelPropertyDialog;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 import xdesign.georgi.espc_retrofit.UI.PropertyDetailsActivity;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -100,7 +101,13 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                 case R.id.contextual_deleteProperty:
                     //....
                     Log.d(TAG," delete pop up menu Item clicked. Property index: " + propertyPosition);
-                    mParant.deletePropertyById(mProperties.get(propertyPosition));
+//                    mParant.deletePropertyById(mProperties.get(propertyPosition));
+                    ConfDelPropertyDialog dialog = ConfDelPropertyDialog.newInstance(mParant
+                            ,mProperties.get(propertyPosition)
+                            ,"Delete Property"
+                            ,"Are you sure that you want to delete this property?");
+                    dialog.show(mParant.getFragmentManager(),"confirm_delete_property_dialog_tag");
+
                     return true;
                 case R.id.contextual_updateProperty:
                     //....
