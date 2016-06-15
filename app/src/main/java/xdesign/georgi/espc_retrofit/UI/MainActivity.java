@@ -208,7 +208,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             @Override
             public void onResponse(Call<Property> call, Response<Property> response) {
 
-                if(response.isSuccessful() || response.body() == null) {
+                if(response.isSuccessful() || response.body() != null) {
                     // add the new property locally first...
                     mProperties.add(newProperty);
                     mRefreshLayout.setRefreshing(false);
@@ -217,6 +217,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }else {
                     showErrorToast(getString(R.string.error_add_new_property_toast_message));
                 }
+
+                mAdapter.notifyDataSetChanged();
+                mRefreshLayout.setRefreshing(false);
             }
 
 

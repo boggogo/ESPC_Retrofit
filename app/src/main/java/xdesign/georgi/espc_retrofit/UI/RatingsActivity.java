@@ -63,7 +63,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         propertyId = getIntent().getExtras().getInt(Constants.KEY_PROPERTY_ID);
         Log.d(TAG, "Selected property id: " + propertyId);
 
-        Call<List<UserPropertyRating>> userRatingsCall = espcService.getAllPropRatingsAssociatedWithUserId(userId);
+        Call<List<UserPropertyRating>> userRatingsCall = espcService.getAllPropRatingsAssociatedWithPropId(propertyId);
         userRatingsCall.enqueue(this);
 
 

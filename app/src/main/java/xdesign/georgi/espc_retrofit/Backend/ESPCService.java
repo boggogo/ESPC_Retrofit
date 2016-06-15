@@ -72,6 +72,9 @@ public interface ESPCService {
     @GET("UserPropertyRatings")
     Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithUserId(@Query(("filter[where][userID]=")) int userID);
 
+    @GET("UserPropertyRatings")
+    Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithPropId(@Query(("filter[where][propertyID]=")) int propertyID);
+
     @POST ("UserPropertyRatings")
     Call<UserPropertyRating> addNewRating(@Body UserPropertyRating userPropertyRating);
 
