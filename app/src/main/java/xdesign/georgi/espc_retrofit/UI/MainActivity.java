@@ -15,6 +15,8 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.MenuInflater;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,7 +36,7 @@ import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, SwipeRefreshLayout.OnRefreshListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, Callback<List<Property>>, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
     private static ArrayList<Property> mProperties = new ArrayList<>();
