@@ -29,12 +29,12 @@ import xdesign.georgi.espc_retrofit.Utils.Constants;
 public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.PropertyViewHolder> {
     private static final String TAG = PropertyAdapter.class.getSimpleName();
     private static List<Property> mProperties;
-    public static Context mContext;
+    public static MainActivity mParant;
     public static int propertyPosition;
 
-    public PropertyAdapter(Context mContext, List<Property> mProperties) {
+    public PropertyAdapter(MainActivity activity, List<Property> mProperties) {
         this.mProperties = mProperties;
-        this.mContext = mContext;
+        this.mParant = activity;
     }
 
     @Override
@@ -67,7 +67,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
                 public boolean onLongClick(View v) {
-                    PopupMenu popupMenu = new PopupMenu(mContext, v);
+                    PopupMenu popupMenu = new PopupMenu(mParant, v);
                     MenuInflater inflater = popupMenu.getMenuInflater();
                     inflater.inflate(R.menu.property_contextual_menu, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(PropertyViewHolder.this);
@@ -84,14 +84,14 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
         @Override
         public void onClick(View v) {
             Log.d(TAG, "Clicked view: " + getAdapterPosition());
-            Intent intent = new Intent(mContext, PropertyDetailsActivity.class);
+            Intent intent = new Intent(mParant, PropertyDetailsActivity.class);
 
             Bundle bundle = new Bundle();
 
             bundle.putSerializable(Constants.KEY_PROPERTY_OBJECT, mProperties.get(getAdapterPosition()));
 
             intent.putExtras(bundle);
-            mContext.startActivity(intent);
+            mParant.startActivity(intent);
         }
 
         @Override
@@ -99,9 +99,12 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
             switch (item.getItemId()) {
                 case R.id.contextual_deleteProperty:
                     //....
+                    Log.d(TAG," delete pop up menu Item clicked. Property index: " + propertyPosition);
+                    mParant.deletePropertyById(mProperties.get(propertyPosition));
                     return true;
                 case R.id.contextual_updateProperty:
                     //....
+                    Log.d(TAG," update pop up menu Item clicked. Property index: " + propertyPosition);
                     return true;
 
                 default:

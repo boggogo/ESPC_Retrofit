@@ -23,6 +23,7 @@ import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -197,6 +198,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
+    }
+
+    public void deletePropertyById(final Property property) {
+        Call<HashMap<String, Integer>> call = espcService.deletePropertyById(property.getId());
+        call.enqueue(new Callback<HashMap<String, Integer>>() {
+            @Override
+            public void onResponse(Call<HashMap<String, Integer>> call, Response<HashMap<String, Integer>> response) {
+                Log.e(TAG, "onResponse: Delete property Success: " + response.isSuccessful());
+                // Check if the delete was successful
+                if(response.isSuccessful()){
+                    // success = > delete the local item from the list
+                    mProperties.remove(property);
+                    mAdapter.notifyDataSetChanged();
+                }else {
+                    Toast.makeText(MainActivity.this,"Delete failed. Please try again.", Toast.LENGTH_LONG).show();
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HashMap<String, Integer>> call, Throwable t) {
+                Log.e(TAG, "onFailure: Delete property " + t.toString());
+            }
+        });
     }
 
 
