@@ -27,4 +27,6 @@
     <string name="conf_delete_property_dialog_tag">confirm_delete_property_dialog_tag</string>
     <string name="conf_delete_property_dialog_title">Delete Property</string>
     <string name="conf_delete_property_dialog_message">Are you sure that you want to delete this property?</string>
+    <string name="toast_error_message_delete_property">Delete failed. Please try again.</string>
+    <string name="toast_error_message_update_property">Error! Property details not updated.</string>
 </resources>

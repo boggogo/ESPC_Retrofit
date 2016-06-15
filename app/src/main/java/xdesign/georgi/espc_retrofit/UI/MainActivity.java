@@ -20,7 +20,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -40,7 +39,7 @@ import xdesign.georgi.espc_retrofit.Backend.Property;
 
 public class MainActivity extends AppCompatActivity implements View.OnClickListener,
         Callback<List<Property>>,
-        SwipeRefreshLayout.OnRefreshListener, Serializable {
+        SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
     private static ArrayList<Property> mProperties = new ArrayList<>();
@@ -228,11 +227,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mAdapter.notifyDataSetChanged();
                     }else {
                         // deletion failed
-                        showDeletionFailedToast();
+                        showErrorToast(getString(R.string.toast_error_message_delete_property));
                     }
 
                 } else {
-                    showDeletionFailedToast();
+                    showErrorToast(getString(R.string.toast_error_message_delete_property));
                 }
             }
 
@@ -243,8 +242,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         });
     }
 
-    private void showDeletionFailedToast() {
-        Toast.makeText(MainActivity.this, "Delete failed. Please try again.", Toast.LENGTH_LONG).show();
+    private void showErrorToast(String errorMessage) {
+        Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+    }
+
+    public void onPositiveUpdatePropertyDetails(final int propertyToBeUpdatedIndex, String newPropAddress, String newPropPrice) {
+
+        Log.d(TAG,"Property to be updated id: " + mProperties.get(propertyToBeUpdatedIndex).toString());
+        Property oldProp = mProperties.get(propertyToBeUpdatedIndex);
+
+
+        final Property newProp = new Property();
+        newProp.setAddress(newPropAddress);
+        newProp.setPrice(newPropPrice);
+        newProp.setId(oldProp.getId());
+
+        // get the property id that will be updated in the backend
+        Call<Property> call = espcService.updatePropertyById(mProperties.get(propertyToBeUpdatedIndex).getId(), newProp);
+        call.enqueue(new Callback<Property>() {
+            @Override
+            public void onResponse(Call<Property> call, Response<Property> response) {
+//                Log.d(TAG,"onResponse update property success: " + response.isSuccessful() + "Details: " + response.errorBody().toString());
+
+                if(response.isSuccessful()){
+                    Log.d(TAG,"Update Property response Body: " + response.body().toString());
+                    mProperties.set(propertyToBeUpdatedIndex,newProp);
+                    mAdapter.notifyDataSetChanged();
+
+                }else{
+                    showErrorToast(getString(R.string.toast_error_message_update_property));
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<Property> call, Throwable t) {
+                Log.e(TAG,"Update Property failed" + t.toString());
+            }
+        });
     }
 
 

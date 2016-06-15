@@ -46,6 +46,9 @@ public interface ESPCService {
     @DELETE ("Properties/{id}")
     Call<HashMap<String, Integer>> deletePropertyById(@Path("id") int id);
 
+    @PUT ("Properties/{id}")
+    Call<Property> updatePropertyById (@Path("id") int id, @Body Property property);
+
     //=============================================== User Methods =============================================
     @GET ("User_ESPCs")
     Call<List<User_ESPC>> getAllUsers();

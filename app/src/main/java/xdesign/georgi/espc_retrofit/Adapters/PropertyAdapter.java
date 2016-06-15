@@ -20,6 +20,7 @@ import java.util.List;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.ConfDelPropertyDialog;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.UpdatePropertyDialog;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 import xdesign.georgi.espc_retrofit.UI.PropertyDetailsActivity;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -111,6 +112,9 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                 case R.id.contextual_updateProperty:
                     //....
                     Log.d(TAG," update pop up menu Item clicked. Property index: " + propertyPosition);
+                    UpdatePropertyDialog updateDialog = UpdatePropertyDialog.newInstance(propertyPosition
+                    ,"Update Property details","Set the new Details of this property");
+                    updateDialog.show(mParant.getFragmentManager(),"update_property_dialog_tag");
                     return true;
 
                 default:

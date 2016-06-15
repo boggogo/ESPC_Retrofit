@@ -6,8 +6,12 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.EditText;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
+import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 
 /**
@@ -22,22 +26,21 @@ public class UpdatePropertyDialog extends DialogFragment {
     // Parent key
     private static final String DIALOG_PARENT = "dialog_parent";
     // Dialog delete property
-    private static final String DIALOG_DELETING_PROPERTY = "property_to_be_deleted";
+    private static final String DIALOG_DELETING_PROPERTY_INDEX = "property_to_be_deleted";
     // String variable to hold the dialog title
     private String mTitle;
     // String message variable to hold the dialog message
     private String mMessage;
     // Reference to the activity that showed this dialog
     private Activity mParent;
-    private Property propertyToBeUpdated;
+    private int propertyToBeUpdatedIndex;
 
-    public static UpdatePropertyDialog newInstance(Activity parent, Property property, String title, String message){
+    public static UpdatePropertyDialog newInstance(int indexOfThePropertyToBeUpdated, String title, String message){
         UpdatePropertyDialog fragment = new UpdatePropertyDialog();
         Bundle args = new Bundle();
         args.putString(DIALOG_TITLE,title);
         args.putString(DIALOG_MESSAGE,message);
-        args.putSerializable(DIALOG_PARENT, (MainActivity)parent);
-        args.putSerializable(DIALOG_DELETING_PROPERTY, property);
+        args.putInt(DIALOG_DELETING_PROPERTY_INDEX, indexOfThePropertyToBeUpdated);
         fragment.setArguments(args);
 
         return fragment;
@@ -46,19 +49,28 @@ public class UpdatePropertyDialog extends DialogFragment {
 
     @Override
     public Dialog onCreateDialog(Bundle savedInstanceState) {
+        final View add_property_layout = LayoutInflater.from(getActivity()).inflate(R.layout.add_property_details_dialog_layout,null);
+
         mTitle = getArguments().getString(DIALOG_TITLE);
         mMessage = getArguments().getString(DIALOG_MESSAGE);
-        mParent = (MainActivity) getArguments().getSerializable(DIALOG_PARENT);
-        propertyToBeUpdated = (Property) getArguments().getSerializable(DIALOG_DELETING_PROPERTY);
+        mParent = getActivity();
+        propertyToBeUpdatedIndex = getArguments().getInt(DIALOG_DELETING_PROPERTY_INDEX);
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder
                 .setTitle(mTitle)
+                .setView(add_property_layout)
                 .setMessage(mMessage)
-                .setPositiveButton("Delete", new DialogInterface.OnClickListener() {
+                .setPositiveButton("Save", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
                         // Add new Property here...
-                        ((MainActivity) (mParent)).onPositiveDeletePropertyById(propertyToBeUpdated);
+                        EditText addressEditText = (EditText) add_property_layout.findViewById(R.id.address);
+                        EditText priceEditText =  (EditText) add_property_layout.findViewById(R.id.price);
+
+                        String address = addressEditText.getText().toString().trim();
+                        String price = priceEditText.getText().toString().trim();
+                        // Add new Property here...
+                        ((MainActivity) (mParent)).onPositiveUpdatePropertyDetails(propertyToBeUpdatedIndex, address, price);
                     }
                 })
                 .setNegativeButton("Cancel", null);
