@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/popup_showRatingOfProperty"
-        android:title="@string/property_popup_update"/>
+        android:title="@string/property_popup_rating"/>
 
     <item
         android:id="@+id/popup_deleteProperty"

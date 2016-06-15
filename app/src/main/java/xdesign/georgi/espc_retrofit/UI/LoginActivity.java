@@ -83,12 +83,15 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
         for(User_ESPC u: response.body()){
             Log.d(TAG,u.getName());
+            // save the user name to the shared preferences
+            mEditor.putString(Constants.USER_NAME_KEY,u.getName()).apply();
         }
         // Check if the list is with size 0, if it is user with the provided name and password does not exists in the backend
         if(response.body().size() != 0){
             // user exists
             // save the user state as logged in
             mEditor.putBoolean(Constants.IS_USER_LOGGED_IN,true).apply();
+
 
             Intent intent = new Intent(LoginActivity.this,MainActivity.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

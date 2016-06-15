@@ -114,6 +114,10 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                     updateDialog.show(mParant.getFragmentManager(),mParant.getString(R.string.update_property_dialog_tag));
                     return true;
 
+                case R.id.popup_showRatingOfProperty:
+                    // Show ratings of this property
+
+
                 default:
                     return false;
             }

@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             startActivity(intent);
         } else {
             // user is logged in
-            Log.d(TAG, "User is logged in");
+            Log.d(TAG, mPreferences.getString(Constants.USER_NAME_KEY,"user") + " is logged in");
         }
 
 
