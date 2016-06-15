@@ -3,14 +3,14 @@
 
     <item
         android:id="@+id/popup_showRatingOfProperty"
-        android:title="@string/property_popup_update"></item>
+        android:title="@string/property_popup_update"/>
 
     <item
         android:id="@+id/popup_deleteProperty"
-        android:title="@string/property_popup_delete"></item>
+        android:title="@string/property_popup_delete"/>
 
     <item
         android:id="@+id/popup_updateProperty"
-        android:title="@string/property_popup_update"></item>
+        android:title="@string/property_popup_update"/>
 
 </menu>
