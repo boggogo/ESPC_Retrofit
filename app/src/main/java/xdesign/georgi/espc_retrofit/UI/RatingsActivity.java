@@ -9,20 +9,27 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import xdesign.georgi.espc_retrofit.Adapters.UserPropertyRatingsAdapter;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
+import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
+import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 
 public class RatingsActivity extends AppCompatActivity implements Callback<List<UserPropertyRating>>, View.OnClickListener {
     private static final String TAG = RatingsActivity.class.getSimpleName();
@@ -31,10 +38,16 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
     private SharedPreferences.Editor mEditor;
     private int userId = -1;
     private int propertyId = -1;
+    private ArrayList<UserPropertyRating> mPropertyRatings = new ArrayList<>();
+    private ArrayList<User_ESPC> mUsers = new ArrayList<>();
+    private UserPropertyRatingsAdapter mAdapter;
+    private RecyclerView mRecyclerView;
+
 
 
     // UI references
     private FloatingActionButton addNewPropertyFAB;
+    private LinearLayout mRatingsContainer;
 
 
     @Override
@@ -54,6 +67,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             }
         });
 
+        mRatingsContainer = (LinearLayout)findViewById(R.id.ratingsContainer);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mPreferences.edit();
         espcService = ESPCService.retrofit.create(ESPCService.class);
@@ -62,6 +76,15 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         // retrieve and store the selected property's id (needed for adding more ratings for THIS property)
         propertyId = getIntent().getExtras().getInt(Constants.KEY_PROPERTY_ID);
         Log.d(TAG, "Selected property id: " + propertyId);
+
+        mAdapter = new UserPropertyRatingsAdapter(RatingsActivity.this, mPropertyRatings , mUsers);
+
+        mRecyclerView = (RecyclerView)findViewById(R.id.recyclerView);
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, null));
+        mRecyclerView.setAdapter(mAdapter);
+
+        espcService.getAllUsers().enqueue(getPropertyRatingCallback);
 
         Call<List<UserPropertyRating>> userRatingsCall = espcService.getAllPropRatingsAssociatedWithPropId(propertyId);
         userRatingsCall.enqueue(this);
@@ -74,16 +97,36 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     }
 
+    private Callback<List<User_ESPC>> getPropertyRatingCallback = new Callback<List<User_ESPC>>() {
+        @Override
+        public void onResponse(Call<List<User_ESPC>> call, Response<List<User_ESPC>> response) {
+            Log.d(TAG,"onResponse getting all users...");
+
+            if(response.isSuccessful()) {
+                mUsers.addAll(response.body());
+            }
+
+            mAdapter.notifyDataSetChanged();
+        }
+
+        @Override
+        public void onFailure(Call<List<User_ESPC>> call, Throwable t) {
+            Log.e(TAG,"onFailure getting all users");
+        }
+    };
+
     @Override
     public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response){
         Log.d(TAG,"onResponse");
         if(response.isSuccessful()) {
             Log.d(TAG,"onResponse user ratings list size: " + response.body().size());
-            for (UserPropertyRating ur : response.body()) {
-
-                Log.d(TAG, "Rating: " + ur.toString());
-            }
+           // for (UserPropertyRating ur : response.body()) {
+                mPropertyRatings.addAll(response.body());
+                //Log.d(TAG, "Rating: " + ur.toString());
+           // }
         }
+
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
