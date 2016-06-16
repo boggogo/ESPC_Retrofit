@@ -29,6 +29,7 @@ import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
 import xdesign.georgi.espc_retrofit.R;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyRatingDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 
@@ -98,7 +99,6 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
     }
 
     private void getDataFromBackend() {
-        espcService.getAllUsers().enqueue(getPropertyRatingCallback);
 
         Call<List<UserPropertyRating>> userRatingsCall = espcService.getAllPropRatingsAssociatedWithPropId(propertyId);
         userRatingsCall.enqueue(this);
@@ -110,6 +110,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             Log.d(TAG,"onResponse getting all users...");
 
             if(response.isSuccessful()) {
+                mUsers.clear();
                 mUsers.addAll(response.body());
             }
             mRefreshLayout.setRefreshing(false);
@@ -129,12 +130,15 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         if(response.isSuccessful()) {
             Log.d(TAG,"onResponse user ratings list size: " + response.body().size());
            // for (UserPropertyRating ur : response.body()) {
+                mPropertyRatings.clear();
                 mPropertyRatings.addAll(response.body());
                 //Log.d(TAG, "Rating: " + ur.toString());
            // }
         }
-        mRefreshLayout.setRefreshing(false);
-        mAdapter.notifyDataSetChanged();
+        espcService.getAllUsers().enqueue(getPropertyRatingCallback);
+
+//        mRefreshLayout.setRefreshing(false);
+//        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -156,30 +160,10 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     @Override
     public void onClick(View v) {
-        // Add new rating for the selected property
-        UserPropertyRating userPropertyRating = new UserPropertyRating();
-        userPropertyRating.setUserID(userId);
-        userPropertyRating.setPropertyID(propertyId);
-        userPropertyRating.setOverallRating(100);
 
-        Call<UserPropertyRating> call = espcService.addNewRating(userPropertyRating);
-        call.enqueue(new Callback<UserPropertyRating>() {
-            @Override
-            public void onResponse(Call<UserPropertyRating> call, Response<UserPropertyRating> response) {
-                Log.d(TAG,"onResponse add new :" + response.isSuccessful());
-                // Show the user the status of the post request...
-                if(response.isSuccessful()){
-                    showToast("Success!");
-                }else{
-                    showToast("Failed!");
-                }
-            }
+        AddNewPropertyRatingDialog dialog = AddNewPropertyRatingDialog.newInstance("Add New Rating","Select a rating from 1 to 5");
+        dialog.show(getFragmentManager(),"add_new_prop_rating_dialog_tag");
 
-            @Override
-            public void onFailure(Call<UserPropertyRating> call, Throwable t) {
-                Log.e(TAG, "Add new user property ratings error: " + t.toString());
-            }
-        });
     }
 
 
@@ -189,8 +173,35 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     @Override
     public void onRefresh() {
-        this.mUsers.clear();
-        this.mPropertyRatings.clear();
         getDataFromBackend();
+    }
+
+    public void onPositiveAddPropertyRating(int selectedValue) {
+        final UserPropertyRating newUserPropertyRating = new UserPropertyRating();
+        newUserPropertyRating.setOverallRating(selectedValue);
+        newUserPropertyRating.setUserID(userId);
+        newUserPropertyRating.setPropertyID(propertyId);
+
+        Call<UserPropertyRating> call = espcService.addNewRating(newUserPropertyRating);
+        call.enqueue(new Callback<UserPropertyRating>() {
+            @Override
+            public void onResponse(Call<UserPropertyRating> call, Response<UserPropertyRating> response) {
+                Log.d(TAG,"onResponse add new :" + response.isSuccessful());
+                // Show the user the status of the post request...
+                if(response.isSuccessful()){
+                    mPropertyRatings.add(newUserPropertyRating);
+                    showToast("Success!");
+                }else{
+                    showToast("Failed!" + response.errorBody());
+                }
+
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<UserPropertyRating> call, Throwable t) {
+                Log.e(TAG, "Add new user property ratings error: " + t.toString());
+            }
+        });
     }
 }
