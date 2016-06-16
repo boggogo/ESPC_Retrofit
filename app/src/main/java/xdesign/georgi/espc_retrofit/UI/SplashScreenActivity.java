@@ -7,7 +7,7 @@ import android.os.Bundle;
 
 import xdesign.georgi.espc_retrofit.R;
 
-public class SplashScreenActivity extends AppCompatActivity {private final int SPLASH_DISPLAY_LENGTH = 1000;
+public class SplashScreenActivity extends AppCompatActivity {private final int SPLASH_DISPLAY_LENGTH = 500;
 
     /**
      * Method that is called when the activity is created
