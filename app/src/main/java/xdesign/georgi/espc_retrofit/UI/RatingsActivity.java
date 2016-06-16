@@ -8,6 +8,7 @@ import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.DrawableCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,7 +32,7 @@ import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 
-public class RatingsActivity extends AppCompatActivity implements Callback<List<UserPropertyRating>>, View.OnClickListener {
+public class RatingsActivity extends AppCompatActivity implements Callback<List<UserPropertyRating>>, View.OnClickListener, SwipeRefreshLayout.OnRefreshListener{
     private static final String TAG = RatingsActivity.class.getSimpleName();
     private static ESPCService espcService;
     private SharedPreferences mPreferences;
@@ -47,7 +48,8 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     // UI references
     private FloatingActionButton addNewPropertyFAB;
-    private LinearLayout mRatingsContainer;
+    private SwipeRefreshLayout mRefreshLayout;
+
 
 
     @Override
@@ -67,7 +69,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             }
         });
 
-        mRatingsContainer = (LinearLayout)findViewById(R.id.ratingsContainer);
+
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mPreferences.edit();
         espcService = ESPCService.retrofit.create(ESPCService.class);
@@ -78,16 +80,14 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         Log.d(TAG, "Selected property id: " + propertyId);
 
         mAdapter = new UserPropertyRatingsAdapter(RatingsActivity.this, mPropertyRatings , mUsers);
-
+        mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
+        mRefreshLayout.setOnRefreshListener(this);
         mRecyclerView = (RecyclerView)findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, null));
         mRecyclerView.setAdapter(mAdapter);
 
-        espcService.getAllUsers().enqueue(getPropertyRatingCallback);
-
-        Call<List<UserPropertyRating>> userRatingsCall = espcService.getAllPropRatingsAssociatedWithPropId(propertyId);
-        userRatingsCall.enqueue(this);
+        getDataFromBackend();
 
 
 
@@ -95,6 +95,13 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
 
 
+    }
+
+    private void getDataFromBackend() {
+        espcService.getAllUsers().enqueue(getPropertyRatingCallback);
+
+        Call<List<UserPropertyRating>> userRatingsCall = espcService.getAllPropRatingsAssociatedWithPropId(propertyId);
+        userRatingsCall.enqueue(this);
     }
 
     private Callback<List<User_ESPC>> getPropertyRatingCallback = new Callback<List<User_ESPC>>() {
@@ -105,12 +112,13 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             if(response.isSuccessful()) {
                 mUsers.addAll(response.body());
             }
-
+            mRefreshLayout.setRefreshing(false);
             mAdapter.notifyDataSetChanged();
         }
 
         @Override
         public void onFailure(Call<List<User_ESPC>> call, Throwable t) {
+            mRefreshLayout.setRefreshing(false);
             Log.e(TAG,"onFailure getting all users");
         }
     };
@@ -125,12 +133,13 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
                 //Log.d(TAG, "Rating: " + ur.toString());
            // }
         }
-
+        mRefreshLayout.setRefreshing(false);
         mAdapter.notifyDataSetChanged();
     }
 
     @Override
     public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
+        mRefreshLayout.setRefreshing(false);
         Log.e(TAG, "Get all user property ratings error: " + t.toString());
     }
 
@@ -176,5 +185,12 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     private void showToast(String toastMessage) {
         Toast.makeText(RatingsActivity.this, toastMessage, Toast.LENGTH_LONG).show();
+    }
+
+    @Override
+    public void onRefresh() {
+        this.mUsers.clear();
+        this.mPropertyRatings.clear();
+        getDataFromBackend();
     }
 }

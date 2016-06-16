@@ -11,6 +11,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -54,6 +55,8 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
         UserPropertyRating userPropertyRating = mPropertyRatings.get(position);
         holder.addedByUserView.setText(getUserNameByUserID(userPropertyRating.getUserID()));
 
+//        TODO Add stars to the rating container here
+
     }
 
     private String getUserNameByUserID(int userID) {
@@ -73,10 +76,12 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
 
     public static class PropertyViewHolder extends RecyclerView.ViewHolder{
         TextView addedByUserView;
+        LinearLayout mRatingsContainer;
 
         public PropertyViewHolder(View view) {
             super(view);
             addedByUserView = (TextView) view.findViewById(R.id.addedByUser);
+            mRatingsContainer = (LinearLayout)view.findViewById(R.id.ratingsContainer);
         }
 
 
