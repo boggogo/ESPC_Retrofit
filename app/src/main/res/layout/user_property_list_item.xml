@@ -46,7 +46,60 @@
             android:layout_alignParentRight="true"
             android:layout_alignParentEnd="true">
 
-            <!-- IMAGE VIEWS WILL BE ADDED PROGRAMMATICALLY HERE -->
+
+            <ImageView
+                android:visibility="visible"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:src="@drawable/star"
+                android:id="@+id/star0" />
+
+            <ImageView
+                android:visibility="invisible"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:src="@drawable/star"
+                android:id="@+id/star1" />
+
+            <ImageView
+                android:visibility="invisible"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:src="@drawable/star"
+                android:id="@+id/star2" />
+
+            <ImageView
+                android:visibility="invisible"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:src="@drawable/star"
+                android:id="@+id/star3" />
+
+            <ImageView
+                android:visibility="invisible"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:src="@drawable/star"
+                android:id="@+id/star4" />
+
+            <ImageView
+                android:visibility="invisible"
+                android:layout_width="20dp"
+                android:layout_height="wrap_content"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"
+                android:src="@drawable/star"
+                android:id="@+id/star5" />
         </LinearLayout>
 
 

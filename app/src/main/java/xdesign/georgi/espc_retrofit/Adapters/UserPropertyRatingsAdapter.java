@@ -3,6 +3,7 @@ package xdesign.georgi.espc_retrofit.Adapters;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -11,6 +12,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -55,7 +57,12 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
         UserPropertyRating userPropertyRating = mPropertyRatings.get(position);
         holder.addedByUserView.setText(getUserNameByUserID(userPropertyRating.getUserID()));
 
-//        TODO Add stars to the rating container here
+
+            for(int j = 0; j < mPropertyRatings.get(position).getOverallRating(); j++){
+                View starView = holder.mRatingsContainer.getChildAt(j);
+                starView.setVisibility(View.VISIBLE);
+            }
+
 
     }
 
