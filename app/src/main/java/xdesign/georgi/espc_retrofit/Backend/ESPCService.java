@@ -67,7 +67,6 @@ public interface ESPCService {
     Call<List<Room>> getAllRoomsAssociatedWithPropertyID(@Query("filter[where][propertyID]=") int propertyID);
 
 
-
     //=============================================== UserPropertyRating Methods =============================================
     @GET("UserPropertyRatings")
     Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithUserId(@Query(("filter[where][userID]=")) int userID);
@@ -75,7 +74,10 @@ public interface ESPCService {
     @GET("UserPropertyRatings")
     Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithPropId(@Query(("filter[where][propertyID]=")) int propertyID);
 
-    @POST ("UserPropertyRatings")
+    @GET("UserPropertyRatings")
+    Call<List<UserPropertyRating>> getAllUserPropertyRatings();
+
+    @POST("UserPropertyRatings")
     Call<UserPropertyRating> addNewRating(@Body UserPropertyRating userPropertyRating);
 
     //=============================================== Backend Base URL =============================================

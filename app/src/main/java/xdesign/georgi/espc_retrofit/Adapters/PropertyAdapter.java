@@ -12,9 +12,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
+import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.ConfDelPropertyDialog;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.UpdatePropertyDialog;
@@ -29,12 +31,14 @@ import xdesign.georgi.espc_retrofit.Utils.Constants;
 public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.PropertyViewHolder> {
     private static final String TAG = PropertyAdapter.class.getSimpleName();
     private static List<Property> mProperties;
+    private static ArrayList<UserPropertyRating> mUserPropertyRatings;
     public static MainActivity mParent;
     public static int propertyPosition;
 
-    public PropertyAdapter(MainActivity activity, List<Property> mProperties) {
+    public PropertyAdapter(MainActivity activity, List<Property> mProperties, ArrayList<UserPropertyRating> mUserPropertyRatings) {
         this.mProperties = mProperties;
         this.mParent = activity;
+        this.mUserPropertyRatings = mUserPropertyRatings;
     }
 
     @Override
@@ -48,6 +52,23 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
         Property property = mProperties.get(position);
         holder.propertyAddress.setText(property.getAddress());
         holder.propertyPrice.setText(property.getPrice() + "");
+        holder.propertyRating.setText(getOverallPropertyRatingById(property.getId())+"");
+    }
+
+    private int getOverallPropertyRatingById(int id) {
+        double totalOverAllRating = 0.0;
+
+        for(UserPropertyRating upr: mUserPropertyRatings){
+            if(upr.getPropertyID() == id){
+                totalOverAllRating += upr.getOverallRating();
+                Log.d(TAG,"Overall rating total value:-> "+totalOverAllRating + "");
+            }
+
+
+        }
+        Log.d(TAG,"===================================");
+        // 10 is the maximum
+        return ((int)(totalOverAllRating % 10));
     }
 
     @Override
@@ -57,12 +78,13 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
 
 
     public static class PropertyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
-        TextView propertyAddress, propertyPrice;
+        TextView propertyAddress, propertyPrice, propertyRating;
 
         public PropertyViewHolder(View view) {
             super(view);
             propertyAddress = (TextView) view.findViewById(R.id.address);
             propertyPrice = (TextView) view.findViewById(R.id.price);
+            propertyRating = (TextView)view.findViewById(R.id.propertyRating);
             view.setOnClickListener(this);
             view.setOnLongClickListener(new View.OnLongClickListener() {
                 @Override
@@ -122,6 +144,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
 
                     // save the clicked property's id in the bundle...
                     ratingsIntent.putExtra(Constants.KEY_PROPERTY_ID,mProperties.get(propertyPosition).getId());
+                    ratingsIntent.putExtra(Constants.KEY_PROPERTY_NAME,mProperties.get(propertyPosition).getAddress());
                     mParent.startActivity(ratingsIntent);
 
                 default:

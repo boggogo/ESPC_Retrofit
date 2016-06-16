@@ -68,7 +68,7 @@ public class AddNewPropertyRatingDialog extends DialogFragment {
                 .setPositiveButton("ADD", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {
-                        int selectedValue = numberPicker.getValue() -1;
+                        int selectedValue = numberPicker.getValue();
 
                         Log.d(TAG,"Selected number: " + selectedValue);
 

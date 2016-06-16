@@ -1,107 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content">
 
     <RelativeLayout
-        android:gravity="center"
-        android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="15dp"
-        android:background="?android:attr/selectableItemBackground">
-
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content">
-
-            <TextView
-                android:textColor="@color/semiBlack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Added by user:"
-                android:id="@+id/addedByUserLabel"
-                android:textSize="12sp" />
-
-            <TextView
-                android:textColor="@color/semiBlack"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Admin:"
-                android:id="@+id/addedByUser"
-                android:textSize="13sp"
-                android:layout_marginLeft="5dp"
-                android:layout_marginStart="5dp" />
-
-        </LinearLayout>
+        android:layout_height="match_parent"
+        android:background="?android:attr/selectableItemBackground"
+        android:orientation="horizontal"
+        android:padding="15dp">
 
 
         <LinearLayout
-            android:id="@+id/ratingsContainer"
-            android:orientation="horizontal"
+
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
-            android:layout_alignParentRight="true"
-            android:layout_alignParentEnd="true">
+            android:id="@+id/linearLayout">
 
 
-            <ImageView
-                android:visibility="visible"
-                android:layout_width="20dp"
+            <TextView
+                android:id="@+id/addedByUserLabel"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:src="@drawable/star"
-                android:id="@+id/star0" />
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentLeft="true"
+                android:layout_alignParentStart="true"
+                android:text="Added by user:"
+                android:textColor="@color/semiBlack"
+                android:textSize="13sp" />
 
-            <ImageView
-                android:visibility="invisible"
-                android:layout_width="20dp"
+            <TextView
+                android:layout_marginLeft="8dp"
+                android:id="@+id/addedByUser"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:src="@drawable/star"
-                android:id="@+id/star1" />
-
-            <ImageView
-                android:visibility="invisible"
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:src="@drawable/star"
-                android:id="@+id/star2" />
-
-            <ImageView
-                android:visibility="invisible"
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:src="@drawable/star"
-                android:id="@+id/star3" />
-
-            <ImageView
-                android:visibility="invisible"
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:src="@drawable/star"
-                android:id="@+id/star4" />
-
-            <ImageView
-                android:visibility="invisible"
-                android:layout_width="20dp"
-                android:layout_height="wrap_content"
-                android:scaleType="fitXY"
-                android:adjustViewBounds="true"
-                android:src="@drawable/star"
-                android:id="@+id/star5" />
+                android:text="Admin"
+                android:textColor="@color/semiBlack"
+                android:textSize="14sp" />
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/userRating"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="5"
+            android:textColor="@color/semiBlack"
+            android:textSize="18sp"
+            android:layout_alignTop="@+id/linearLayout"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 

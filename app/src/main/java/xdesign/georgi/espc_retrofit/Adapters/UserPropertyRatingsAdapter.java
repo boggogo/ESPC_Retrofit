@@ -56,12 +56,7 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
     public void onBindViewHolder(PropertyViewHolder holder, int position) {
         UserPropertyRating userPropertyRating = mPropertyRatings.get(position);
         holder.addedByUserView.setText(getUserNameByUserID(userPropertyRating.getUserID()));
-
-
-            for(int j = 0; j < mPropertyRatings.get(position).getOverallRating(); j++){
-                View starView = holder.mRatingsContainer.getChildAt(j);
-                starView.setVisibility(View.VISIBLE);
-            }
+        holder.mRatingsContainer.setText(userPropertyRating.getOverallRating()+"");
 
 
     }
@@ -82,13 +77,12 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
 
 
     public static class PropertyViewHolder extends RecyclerView.ViewHolder{
-        TextView addedByUserView;
-        LinearLayout mRatingsContainer;
+        TextView addedByUserView, mRatingsContainer;
 
         public PropertyViewHolder(View view) {
             super(view);
             addedByUserView = (TextView) view.findViewById(R.id.addedByUser);
-            mRatingsContainer = (LinearLayout)view.findViewById(R.id.ratingsContainer);
+            mRatingsContainer = (TextView) view.findViewById(R.id.userRating);
         }
 
 

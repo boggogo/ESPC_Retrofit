@@ -63,6 +63,8 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+
+
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -78,9 +80,12 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         espcService = ESPCService.retrofit.create(ESPCService.class);
         userId = mPreferences.getInt(Constants.USER_ID_KEY,userId);
 
+        Bundle data = getIntent().getExtras();
+
         // retrieve and store the selected property's id (needed for adding more ratings for THIS property)
-        propertyId = getIntent().getExtras().getInt(Constants.KEY_PROPERTY_ID);
+        propertyId = data.getInt(Constants.KEY_PROPERTY_ID);
         Log.d(TAG, "Selected property id: " + propertyId);
+        getSupportActionBar().setTitle(data.getString(Constants.KEY_PROPERTY_NAME));
 
         mAdapter = new UserPropertyRatingsAdapter(RatingsActivity.this, mPropertyRatings , mUsers);
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
@@ -100,7 +105,12 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     }
 
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Log.d(TAG,"OnResume called");
+        getDataFromBackend();
+    }
 
     private void getDataFromBackend() {
 
@@ -196,7 +206,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             public void onResponse(Call<UserPropertyRating> call, Response<UserPropertyRating> response) {
                 Log.d(TAG,"onResponse add new :" + response.isSuccessful());
                 // Show the user the status of the post request...
-                if(response.isSuccessful()){
+                if(response.isSuccessful() | response.body() != null){
                     mPropertyRatings.add(newUserPropertyRating);
                     showToast("Success!");
                 }else{

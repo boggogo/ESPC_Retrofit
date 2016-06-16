@@ -21,8 +21,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.w3c.dom.Text;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -47,6 +45,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private static final String TAG = MainActivity.class.getSimpleName();
     private static ESPCService espcService;
     public static ArrayList<Property> mProperties = new ArrayList<>();
+    public static ArrayList<UserPropertyRating> mPropertyUserRatings = new ArrayList<>();
     private static int userId = -1;
     private static PropertyAdapter mAdapter;
     private SharedPreferences mPreferences;
@@ -99,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         setUpFabButton();
 
 
-        mAdapter = new PropertyAdapter(this, mProperties);
+        mAdapter = new PropertyAdapter(this, mProperties, mPropertyUserRatings);
 
 
         mRecyclerView = (RecyclerView) findViewById(R.id.listView);
@@ -115,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         Log.d(TAG,"List size: " + mProperties.size());
 
-//        mAdapter.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
     }
 
     private void setUpFabButton() {
@@ -131,12 +130,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void refetchPropertiesFromBackend() {
         mProperties.clear();
+        mPropertyUserRatings.clear();
         Call<List<Property>> call = espcService.getAllProperties();
         call.enqueue(this);
     }
 
     private void refetchThisUserPropertiesFromBackend(){
         mProperties.clear();
+        mPropertyUserRatings.clear();
         espcService.getAllPropertiesAssociatedWithUserId(userId).enqueue(this);
     }
 
@@ -149,10 +150,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-        Log.e(TAG, "onResponse. Success: " + response.isSuccessful());
+        Log.e(TAG, "onResponse get all properties. Success: " + response.isSuccessful());
         mProperties.addAll(response.body());
         mAdapter.notifyDataSetChanged();
-        mRefreshLayout.setRefreshing(false);
+
+
+        espcService.getAllUserPropertyRatings().enqueue(new Callback<List<UserPropertyRating>>() {
+            @Override
+            public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
+                Log.e(TAG, "onResponse get all properties ratings. Success: " + response.isSuccessful());
+
+                mPropertyUserRatings.addAll(response.body());
+                mAdapter.notifyDataSetChanged();
+                mRefreshLayout.setRefreshing(false);
+            }
+
+            @Override
+            public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
+                mAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     @Override
