@@ -16,6 +16,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -44,6 +45,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
     private ArrayList<User_ESPC> mUsers = new ArrayList<>();
     private UserPropertyRatingsAdapter mAdapter;
     private RecyclerView mRecyclerView;
+    private TextView mEmptyTextView;
 
 
 
@@ -70,7 +72,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             }
         });
 
-
+        mEmptyTextView = (TextView)findViewById(R.id.empty);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mPreferences.edit();
         espcService = ESPCService.retrofit.create(ESPCService.class);
@@ -97,6 +99,8 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
 
     }
+
+
 
     private void getDataFromBackend() {
 
@@ -134,6 +138,10 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
                 mPropertyRatings.addAll(response.body());
                 //Log.d(TAG, "Rating: " + ur.toString());
            // }
+        }
+        Log.d(TAG,"List size: " + mPropertyRatings.size());
+        if(mPropertyRatings.size() == 0){
+            mEmptyTextView.setVisibility(View.VISIBLE);
         }
         espcService.getAllUsers().enqueue(getPropertyRatingCallback);
 

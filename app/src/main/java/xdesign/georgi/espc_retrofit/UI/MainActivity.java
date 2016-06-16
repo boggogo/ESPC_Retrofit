@@ -18,7 +18,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,6 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //    UI References
     private RecyclerView mRecyclerView;
+    private TextView  mEmptyTextView;
     private FloatingActionButton addNewPropertyFAB;
     private static SwipeRefreshLayout mRefreshLayout;
 
@@ -65,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         Log.e(TAG, "onCreate - MainActivity");
 
+        mEmptyTextView = (TextView)findViewById(R.id.empty);
 
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
@@ -109,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     protected void onResume() {
         super.onResume();
         Log.d(TAG,"List size: " + mProperties.size());
+
 //        mAdapter.notifyDataSetChanged();
     }
 
@@ -220,6 +226,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                 mAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
+                if(mProperties.size() == 0){
+                    mEmptyTextView.setVisibility(View.VISIBLE);
+                }
             }
 
 
