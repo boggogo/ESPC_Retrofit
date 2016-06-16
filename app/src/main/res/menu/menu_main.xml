@@ -22,4 +22,11 @@
         android:orderInCategory="300"
         android:title="@string/action_log_out"
         app:showAsAction="never" />
+
+    <item
+        android:title="@string/action_seatch"
+        android:id="@+id/action_search"
+        android:orderInCategory="400"
+        android:icon="@drawable/search_icon"
+        app:showAsAction="always" />
 </menu>
