@@ -144,6 +144,8 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
 
                     // save the clicked property's id in the bundle...
                     ratingsIntent.putExtra(Constants.KEY_PROPERTY_ID,mProperties.get(propertyPosition).getId());
+                    Log.d(TAG,"set the property id to the intent: " + mProperties.get(propertyPosition).getId());
+
                     ratingsIntent.putExtra(Constants.KEY_PROPERTY_NAME,mProperties.get(propertyPosition).getAddress());
                     mParent.startActivity(ratingsIntent);
 
