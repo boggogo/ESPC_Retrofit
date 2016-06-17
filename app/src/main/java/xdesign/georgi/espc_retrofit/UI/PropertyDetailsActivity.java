@@ -74,11 +74,13 @@ public class PropertyDetailsActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<List<Room>> call, Response<List<Room>> response) {
                 Log.d(TAG,"onResponse Property rooms: " + response.body().toString());
-                mRooms.addAll(response.body());
-                mAdapter.notifyDataSetChanged();
+                if(response.isSuccessful()){
+                    mRooms.addAll(response.body());
+                    mAdapter.notifyDataSetChanged();
 
-                if(mRooms.size() == 0){
-                    mEmptyTextView.setVisibility(View.VISIBLE);
+                    if(mRooms.size() == 0){
+                        mEmptyTextView.setVisibility(View.VISIBLE);
+                    }
                 }
             }
 

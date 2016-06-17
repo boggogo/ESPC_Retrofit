@@ -234,18 +234,24 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 if(response.isSuccessful() || response.body() != null) {
                     // add the new property locally first...
                     mProperties.add(newProperty);
+                    // refetch data from the backend (to get the new ids and delete with work at this point)
+                    refetchPropertiesFromBackend();
+
                     mRefreshLayout.setRefreshing(false);
                     Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
                     Toast.makeText(context, "Successfully added new property", Toast.LENGTH_SHORT).show();
+
+
                 }else {
                     showErrorToast(getString(R.string.error_add_new_property_toast_message));
                 }
 
                 mAdapter.notifyDataSetChanged();
                 mRefreshLayout.setRefreshing(false);
-                if(mProperties.size() == 0){
-                    mEmptyTextView.setVisibility(View.VISIBLE);
-                }
+
+//                if(mProperties.size() == 0){
+//                    mEmptyTextView.setVisibility(View.VISIBLE);
+//                }
             }
 
 
