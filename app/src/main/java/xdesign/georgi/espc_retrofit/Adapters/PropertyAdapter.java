@@ -66,9 +66,9 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
 
 
         }
-        Log.d(TAG,"===================================");
+        Log.d(TAG,"=================================== " + totalOverAllRating % 10);
         // 10 is the maximum
-        return ((int)(totalOverAllRating % 10));
+        return ((int)((totalOverAllRating % 10)));
     }
 
     @Override

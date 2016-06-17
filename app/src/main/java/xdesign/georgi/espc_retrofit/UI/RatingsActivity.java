@@ -20,6 +20,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit2.Call;
@@ -252,6 +253,33 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             @Override
             public void onFailure(Call<UserPropertyRating> call, Throwable t) {
                 Log.e(TAG, "Update new user property ratings error: " + t.toString());
+            }
+        });
+    }
+
+    public void onPositiveDeletePropertyRatingById(UserPropertyRating propertyRatingToDelete) {
+        final UserPropertyRating ratingToDelete = propertyRatingToDelete;
+
+        espcService.deletePropertyRatingById(ratingToDelete.getId()).enqueue(new Callback<HashMap<String, Integer>>() {
+            @Override
+            public void onResponse(Call<HashMap<String, Integer>> call, Response<HashMap<String, Integer>> response) {
+                if(response.isSuccessful()){
+                    if(response.body().size() == 1){
+                        // returns HashMap with size 1 upon successful deletion
+                        mPropertyRatings.remove(ratingToDelete);
+                        mAdapter.notifyDataSetChanged();
+                        showToast("Success!");
+                    }else{
+                        return;
+                    }
+                }else{
+                    showToast("Failed!" + response.errorBody());
+                }
+            }
+
+            @Override
+            public void onFailure(Call<HashMap<String, Integer>> call, Throwable t) {
+                showToast("Failed!" + t.toString());
             }
         });
     }

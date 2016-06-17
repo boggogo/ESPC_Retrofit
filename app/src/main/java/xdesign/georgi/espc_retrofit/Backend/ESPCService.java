@@ -83,6 +83,9 @@ public interface ESPCService {
     @PUT ("UserPropertyRatings/{id}")
     Call<UserPropertyRating> updatePropertyRatingById(@Path("id") int id, @Body UserPropertyRating userPropertyRating );
 
+    @DELETE("UserPropertyRatings/{id}")
+    Call<HashMap<String, Integer>> deletePropertyRatingById(@Path("id") int id);
+
     //=============================================== Backend Base URL =============================================
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://10.0.2.2:3000/api/")

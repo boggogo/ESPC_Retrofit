@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
 import xdesign.georgi.espc_retrofit.R;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.ConfDelPropRatingDialog;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.UpdatePropertyRatingDialog;
 import xdesign.georgi.espc_retrofit.UI.RatingsActivity;
 
@@ -104,6 +105,9 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
 //                            , mParent.getString(R.string.conf_delete_property_dialog_title)
 //                            , mParent.getString(R.string.conf_delete_property_dialog_message));
 //                    dialog.show(mParent.getFragmentManager(), mParent.getString(R.string.conf_delete_property_dialog_tag));
+//                    ((RatingsActivity) mParent).onPositiveDeletePropertyRatingById();
+                    ConfDelPropRatingDialog confirmDeleteOfRatingDialog = ConfDelPropRatingDialog.newInstance(mPropertyRatings.get(propertyPosition),"Delete rating","You are about to delete this rating for this property. Press Delete to confirm.");
+                    confirmDeleteOfRatingDialog.show(mParent.getFragmentManager(),"confirm_delete_of_this_property_rating");
 
                     return true;
                 case R.id.popup_updatePropertyRating:

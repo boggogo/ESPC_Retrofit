@@ -1,9 +1,11 @@
 package xdesign.georgi.espc_retrofit.Backend;
 
+import java.io.Serializable;
+
 /**
  * Created by georgi on 15/06/16.
  */
-public class UserPropertyRating {
+public class UserPropertyRating implements Serializable{
     private int id;
 
     public int getId() {
