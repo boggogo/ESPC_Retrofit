@@ -29,6 +29,7 @@ import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.Backend.Room;
 import xdesign.georgi.espc_retrofit.R;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewRoomDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 
@@ -42,6 +43,8 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private FloatingActionButton addNewPropertyFAB;
 
+    private  Property property;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,6 +53,9 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        Bundle data = getIntent().getExtras();
+        property = (Property) data.getSerializable(Constants.KEY_PROPERTY_OBJECT);
 
         setUpFabButton();
 
@@ -70,8 +76,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
     }
 
     private void getAllPropertyRooms() {
-        Bundle data = getIntent().getExtras();
-        Property property = (Property) data.getSerializable(Constants.KEY_PROPERTY_OBJECT);
+
         getSupportActionBar().setTitle(property.getAddress());
         Log.d(TAG, property.toString());
 
@@ -143,10 +148,16 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
 
     @Override
     public void onClick(View v) {
+        AddNewRoomDialog dialog = AddNewRoomDialog.newInstance("Add new Room","Set the name of the new room to this property.");
+        dialog.show(getFragmentManager(),"add_new_room__dialog_tag");
+
+    }
+
+    public void onPositiveAddNewRoom(String newRoomName) {
         // Add new Room dialog here
         Room newRoom = new Room();
-        newRoom.setPropertyID(111);
-        newRoom.setName("Property from Android");
+        newRoom.setPropertyID(property.getId());
+        newRoom.setName(newRoomName);
 
         espcService.addNewRoom(newRoom).enqueue(new Callback<Room>() {
             @Override
@@ -156,7 +167,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
                     Log.d(TAG, "onResponse add a new room: " + response.body().toString());
                 }
 
-               getAllPropertyRooms();
+                getAllPropertyRooms();
             }
 
             @Override
@@ -164,6 +175,5 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
                 Log.e(TAG,"Add a new Room" + t.toString());
             }
         });
-
     }
 }
