@@ -10,6 +10,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
@@ -77,30 +78,18 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
     }
 
 
-    public static class PropertyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener {
+    public static class PropertyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, PopupMenu.OnMenuItemClickListener, View.OnLongClickListener {
         TextView propertyAddress, propertyPrice, propertyRating;
-
+        ImageView propertyImage;
         public PropertyViewHolder(View view) {
             super(view);
             propertyAddress = (TextView) view.findViewById(R.id.address);
             propertyPrice = (TextView) view.findViewById(R.id.price);
             propertyRating = (TextView)view.findViewById(R.id.propertyRating);
-            view.setOnClickListener(this);
-            view.setOnLongClickListener(new View.OnLongClickListener() {
-                @Override
-                public boolean onLongClick(View v) {
-                    PopupMenu popupMenu = new PopupMenu(mParent, v);
-                    MenuInflater inflater = popupMenu.getMenuInflater();
-                    inflater.inflate(R.menu.popup_property_menu_layout, popupMenu.getMenu());
-                    popupMenu.setOnMenuItemClickListener(PropertyViewHolder.this);
-
-                    // save the position of the item that was long pressed...
-                    propertyPosition = getAdapterPosition();
-                    Log.d(TAG,"Item position: " + propertyPosition);
-                    popupMenu.show();
-                    return true;
-                }
-            });
+            propertyImage = (ImageView)view.findViewById(R.id.propertyImage);
+            propertyImage.setOnClickListener(this);
+            propertyImage.setOnLongClickListener(this);
+            view.setOnLongClickListener(this);
         }
 
         @Override
@@ -154,6 +143,19 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
             }
         }
 
+        @Override
+        public boolean onLongClick(View v) {
+            PopupMenu popupMenu = new PopupMenu(mParent, v);
+            MenuInflater inflater = popupMenu.getMenuInflater();
+            inflater.inflate(R.menu.popup_property_menu_layout, popupMenu.getMenu());
+            popupMenu.setOnMenuItemClickListener(PropertyViewHolder.this);
+
+            // save the position of the item that was long pressed...
+            propertyPosition = getAdapterPosition();
+            Log.d(TAG,"Item position: " + propertyPosition);
+            popupMenu.show();
+            return true;
+        }
     }
 
 }
