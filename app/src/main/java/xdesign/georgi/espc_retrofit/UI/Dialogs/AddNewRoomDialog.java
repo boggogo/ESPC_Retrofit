@@ -6,11 +6,9 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.EditText;
 
 import xdesign.georgi.espc_retrofit.R;
@@ -53,7 +51,7 @@ public class AddNewRoomDialog extends DialogFragment {
         mTitle = getArguments().getString(DIALOG_TITLE);
         mMessage = getArguments().getString(DIALOG_MESSAGE);
 
-        final View addNewLayout = LayoutInflater.from(getActivity()).inflate(R.layout.add_new_room_dialog_layout,null);
+        final View addNewLayout = LayoutInflater.from(getActivity()).inflate(R.layout.room_dialog_layout,null);
 
         final EditText roomNameEditText = (EditText) addNewLayout.findViewById(R.id.newRoomName);
 

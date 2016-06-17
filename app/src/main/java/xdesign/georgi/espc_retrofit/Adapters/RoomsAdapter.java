@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import xdesign.georgi.espc_retrofit.Backend.Room;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.ConfDeleteRoomDialog;
+import xdesign.georgi.espc_retrofit.UI.Dialogs.UpdateRoomDialog;
 
 /**
  * Created by georgi on 14/06/16.
@@ -92,6 +93,9 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomViewHold
                     Log.d(TAG, " update pop up menu Item clicked. Property index: " + propertyPosition);
 //                    UpdatePropertyRatingDialog dialog = UpdatePropertyRatingDialog.newInstance(propertyPosition, "Update Rating", "Set the new rating for this property.");
 //                    dialog.show(mParent.getFragmentManager(), "update_property_rating_dialog_tag");
+
+                    UpdateRoomDialog dialog = UpdateRoomDialog.newInstance(mRooms.get(propertyPosition),"Update details","Update the details of this room");
+                    dialog.show(mParent.getFragmentManager(),"update_room_details_dialog");
 
                     return true;
 

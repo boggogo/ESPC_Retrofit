@@ -15,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,7 +34,7 @@ import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewRoomDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Utils.DividerItemDecoration;
 
-public class PropertyDetailsActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener{
+public class PropertyDetailsActivity extends AppCompatActivity implements SwipeRefreshLayout.OnRefreshListener, View.OnClickListener {
     private static final String TAG = PropertyDetailsActivity.class.getSimpleName();
     private static ESPCService espcService;
     private ArrayList<Room> mRooms = new ArrayList<>();
@@ -43,7 +44,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
     private SwipeRefreshLayout mSwipeRefreshLayout;
     private FloatingActionButton addNewPropertyFAB;
 
-    private  Property property;
+    private Property property;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,14 +60,14 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
 
         setUpFabButton();
 
-        mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
+        mSwipeRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
 
-        mEmptyTextView = (TextView)findViewById(R.id.empty);
+        mEmptyTextView = (TextView) findViewById(R.id.empty);
         espcService = ESPCService.retrofit.create(ESPCService.class);
         mAdapter = new RoomsAdapter(this, mRooms);
 
-        mRecyclerView = (RecyclerView)findViewById(R.id.listView);
+        mRecyclerView = (RecyclerView) findViewById(R.id.listView);
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, null));
@@ -84,13 +85,13 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
         propertyRooms.enqueue(new Callback<List<Room>>() {
             @Override
             public void onResponse(Call<List<Room>> call, Response<List<Room>> response) {
-                Log.d(TAG,"onResponse Property rooms: " + response.body().toString());
-                if(response.isSuccessful()){
+                Log.d(TAG, "onResponse Property rooms: " + response.body().toString());
+                if (response.isSuccessful()) {
                     mRooms.clear();
                     mRooms.addAll(response.body());
                     mAdapter.notifyDataSetChanged();
 
-                    if(mRooms.size() == 0){
+                    if (mRooms.size() == 0) {
                         mEmptyTextView.setVisibility(View.VISIBLE);
                     }
                 }
@@ -100,20 +101,20 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
 
             @Override
             public void onFailure(Call<List<Room>> call, Throwable t) {
-                Log.e(TAG,"Update Property failed " + t.toString());
+                Log.e(TAG, "Update Property failed " + t.toString());
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
     }
 
     public void onPositiveDeleteRoomById(final Room roomToDelete) {
-        Log.d(TAG,"roomID to delete: " + roomToDelete.getId());
+        Log.d(TAG, "roomID to delete: " + roomToDelete.getId());
         Call<HashMap<String, Integer>> deleteRoomCall = espcService.deleteRoomById(roomToDelete.getId());
         deleteRoomCall.enqueue(new Callback<HashMap<String, Integer>>() {
             @Override
             public void onResponse(Call<HashMap<String, Integer>> call, Response<HashMap<String, Integer>> response) {
 
-                if(response.isSuccessful() | response.body().size() == 1) {
+                if (response.isSuccessful() | response.body().size() == 1) {
                     Log.d(TAG, "onResponse delete a room: " + response.body().toString());
                     mRooms.remove(roomToDelete);
                     mAdapter.notifyDataSetChanged();
@@ -124,7 +125,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
 
             @Override
             public void onFailure(Call<HashMap<String, Integer>> call, Throwable t) {
-                Log.e(TAG,"Delete Room failed " + t.toString());
+                Log.e(TAG, "Delete Room failed " + t.toString());
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
@@ -148,8 +149,8 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
 
     @Override
     public void onClick(View v) {
-        AddNewRoomDialog dialog = AddNewRoomDialog.newInstance("Add new Room","Set the name of the new room to this property.");
-        dialog.show(getFragmentManager(),"add_new_room__dialog_tag");
+        AddNewRoomDialog dialog = AddNewRoomDialog.newInstance("Add new Room", "Set the name of the new room to this property.");
+        dialog.show(getFragmentManager(), "add_new_room__dialog_tag");
 
     }
 
@@ -163,7 +164,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
             @Override
             public void onResponse(Call<Room> call, Response<Room> response) {
 
-                if(response.isSuccessful()){
+                if (response.isSuccessful()) {
                     Log.d(TAG, "onResponse add a new room: " + response.body().toString());
                 }
 
@@ -172,8 +173,42 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
 
             @Override
             public void onFailure(Call<Room> call, Throwable t) {
-                Log.e(TAG,"Add a new Room" + t.toString());
+                Log.e(TAG, "Add a new Room" + t.toString());
             }
         });
+    }
+
+    public void onPositiveUpdateRoom(final Room roomToUpdate, String newRoomName) {
+        final Room newRoom = new Room();
+        newRoom.setId(roomToUpdate.getId());
+        newRoom.setName(newRoomName);
+        newRoom.setPropertyID(roomToUpdate.getPropertyID());
+
+        espcService.updateRoomById(roomToUpdate.getId(), newRoom).enqueue(new Callback<Room>() {
+            @Override
+            public void onResponse(Call<Room> call, Response<Room> response) {
+                Log.d(TAG, "onResponse update room: success: " + response.isSuccessful());
+
+                if (response.isSuccessful()) {
+
+                    mRooms.remove(roomToUpdate);
+                    mRooms.add(newRoom);
+
+                    mAdapter.notifyDataSetChanged();
+
+                } else {
+                    showErrorToast(getString(R.string.toast_error_updating_room_details));
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Room> call, Throwable t) {
+                showErrorToast(getString(R.string.toast_error_updating_room_details));
+            }
+        });
+    }
+
+    private void showErrorToast(String errorMessage) {
+        Toast.makeText(PropertyDetailsActivity.this, errorMessage, Toast.LENGTH_LONG).show();
     }
 }

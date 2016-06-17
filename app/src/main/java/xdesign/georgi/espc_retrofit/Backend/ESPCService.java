@@ -72,6 +72,8 @@ public interface ESPCService {
     @POST("Rooms")
     Call<Room> addNewRoom(@Body Room room);
 
+    @PUT("Rooms/{id}")
+    Call<Room> updateRoomById(@Path("id") int id, @Body Room room);
 
     //=============================================== UserPropertyRating Methods =============================================
     @GET("UserPropertyRatings")
@@ -86,8 +88,8 @@ public interface ESPCService {
     @POST("UserPropertyRatings")
     Call<UserPropertyRating> addNewRating(@Body UserPropertyRating userPropertyRating);
 
-    @PUT ("UserPropertyRatings/{id}")
-    Call<UserPropertyRating> updatePropertyRatingById(@Path("id") int id, @Body UserPropertyRating userPropertyRating );
+    @PUT("UserPropertyRatings/{id}")
+    Call<UserPropertyRating> updatePropertyRatingById(@Path("id") int id, @Body UserPropertyRating userPropertyRating);
 
     @DELETE("UserPropertyRatings/{id}")
     Call<HashMap<String, Integer>> deletePropertyRatingById(@Path("id") int id);
