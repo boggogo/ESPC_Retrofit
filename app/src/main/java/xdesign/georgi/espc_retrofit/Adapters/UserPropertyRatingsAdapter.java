@@ -91,7 +91,7 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
             popupMenu.show();
 
 
-            return false;
+            return true;
         }
 
         @Override
@@ -100,12 +100,7 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
                 case R.id.popup_deletePropertyRating:
                     //....
                     Log.d(TAG," delete pop up menu Item clicked. Property index: " + propertyPosition);
-//                    mParent.onPositiveDeletePropertyById(mProperties.get(propertyPosition));
-//                    ConfDelPropertyDialog dialog = ConfDelPropertyDialog.newInstance(mPropertyRatings.get(propertyPosition)
-//                            , mParent.getString(R.string.conf_delete_property_dialog_title)
-//                            , mParent.getString(R.string.conf_delete_property_dialog_message));
-//                    dialog.show(mParent.getFragmentManager(), mParent.getString(R.string.conf_delete_property_dialog_tag));
-//                    ((RatingsActivity) mParent).onPositiveDeletePropertyRatingById();
+
                     ConfDelPropRatingDialog confirmDeleteOfRatingDialog = ConfDelPropRatingDialog.newInstance(mPropertyRatings.get(propertyPosition),"Delete rating","You are about to delete this rating for this property. Press Delete to confirm.");
                     confirmDeleteOfRatingDialog.show(mParent.getFragmentManager(),"confirm_delete_of_this_property_rating");
 

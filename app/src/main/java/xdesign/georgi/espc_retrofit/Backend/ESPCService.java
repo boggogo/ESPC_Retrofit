@@ -66,6 +66,12 @@ public interface ESPCService {
     @GET("Rooms")
     Call<List<Room>> getAllRoomsAssociatedWithPropertyID(@Query("filter[where][propertyID]=") int propertyID);
 
+    @DELETE("Rooms/{id}")
+    Call<HashMap<String, Integer>> deleteRoomById(@Path("id") int id);
+
+    @POST("Rooms")
+    Call<Room> addNewRoom(@Body Room room);
+
 
     //=============================================== UserPropertyRating Methods =============================================
     @GET("UserPropertyRatings")

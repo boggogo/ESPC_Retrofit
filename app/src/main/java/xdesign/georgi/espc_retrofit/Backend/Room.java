@@ -1,9 +1,11 @@
 package xdesign.georgi.espc_retrofit.Backend;
 
+import java.io.Serializable;
+
 /**
  * Created by georgi on 15/06/16.
  */
-public class Room {
+public class Room implements Serializable {
     private int id;
     private int propertyID;
     private String name;
