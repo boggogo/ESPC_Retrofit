@@ -1,9 +1,12 @@
 package xdesign.georgi.espc_retrofit.UI;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -37,7 +40,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
     private static RoomsAdapter mAdapter;
     private TextView mEmptyTextView;
     private SwipeRefreshLayout mSwipeRefreshLayout;
-    private FloatingActionButton fab;
+    private FloatingActionButton addNewPropertyFAB;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,9 +51,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(this);
-
+        setUpFabButton();
 
         mSwipeRefreshLayout = (SwipeRefreshLayout)findViewById(R.id.swipe_refresh_layout);
         mSwipeRefreshLayout.setOnRefreshListener(this);
@@ -122,6 +123,17 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
                 mSwipeRefreshLayout.setRefreshing(false);
             }
         });
+    }
+
+    private void setUpFabButton() {
+        // set up addNewPropertyFAB button
+        addNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
+        // Change the color of the fab icon to white...
+        Drawable fabDrawable = addNewPropertyFAB.getDrawable();
+        DrawableCompat.setTint(fabDrawable, Color.WHITE);
+        // set up the onClickListener...
+        if (addNewPropertyFAB != null)
+            addNewPropertyFAB.setOnClickListener(this);
     }
 
     @Override
