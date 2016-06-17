@@ -222,4 +222,37 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             }
         });
     }
+
+    public void onPositiveUpdatePropRating(int selectedValue, final int propertyToBeUpdatedIndex) {
+        Log.d(TAG,"Selected Value: " + selectedValue + " " + "id of property rating to be updated: " + mPropertyRatings.get(propertyToBeUpdatedIndex).getId());
+        UserPropertyRating oldRating = mPropertyRatings.get(propertyToBeUpdatedIndex);
+        // Set up new poroperty rating
+        final UserPropertyRating newRating = new UserPropertyRating();
+        newRating.setPropertyID(oldRating.getPropertyID());
+        newRating.setUserID(oldRating.getUserID());
+        newRating.setOverallRating(selectedValue);
+        newRating.setId(oldRating.getId());
+
+        Call<UserPropertyRating> userPropertyRatingCall = espcService.updatePropertyRatingById(mPropertyRatings.get(propertyToBeUpdatedIndex).getId(), newRating);
+        userPropertyRatingCall.enqueue(new Callback<UserPropertyRating>() {
+            @Override
+            public void onResponse(Call<UserPropertyRating> call, Response<UserPropertyRating> response) {
+                Log.d(TAG,"onResponse add new :" + response.isSuccessful());
+                // Show the user the status of the post request...
+                if(response.isSuccessful() | response.body() != null){
+                    mPropertyRatings.set(propertyToBeUpdatedIndex,newRating);
+                    showToast("Success!");
+                }else{
+                    showToast("Failed!" + response.errorBody());
+                }
+
+                mAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onFailure(Call<UserPropertyRating> call, Throwable t) {
+                Log.e(TAG, "Update new user property ratings error: " + t.toString());
+            }
+        });
+    }
 }

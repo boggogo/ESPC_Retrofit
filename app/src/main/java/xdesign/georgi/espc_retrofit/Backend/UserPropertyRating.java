@@ -4,6 +4,16 @@ package xdesign.georgi.espc_retrofit.Backend;
  * Created by georgi on 15/06/16.
  */
 public class UserPropertyRating {
+    private int id;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
     private int userID;
     private int propertyID;
     private int overallRating;

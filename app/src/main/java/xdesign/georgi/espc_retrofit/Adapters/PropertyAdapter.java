@@ -91,7 +91,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                 public boolean onLongClick(View v) {
                     PopupMenu popupMenu = new PopupMenu(mParent, v);
                     MenuInflater inflater = popupMenu.getMenuInflater();
-                    inflater.inflate(R.menu.property_popup_menu, popupMenu.getMenu());
+                    inflater.inflate(R.menu.popup_property_menu_layout, popupMenu.getMenu());
                     popupMenu.setOnMenuItemClickListener(PropertyViewHolder.this);
 
                     // save the position of the item that was long pressed...

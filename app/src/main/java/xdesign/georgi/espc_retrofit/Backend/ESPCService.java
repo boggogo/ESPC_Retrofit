@@ -80,6 +80,9 @@ public interface ESPCService {
     @POST("UserPropertyRatings")
     Call<UserPropertyRating> addNewRating(@Body UserPropertyRating userPropertyRating);
 
+    @PUT ("UserPropertyRatings/{id}")
+    Call<UserPropertyRating> updatePropertyRatingById(@Path("id") int id, @Body UserPropertyRating userPropertyRating );
+
     //=============================================== Backend Base URL =============================================
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://10.0.2.2:3000/api/")
