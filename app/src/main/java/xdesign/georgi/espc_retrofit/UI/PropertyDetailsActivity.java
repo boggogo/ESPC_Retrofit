@@ -132,6 +132,26 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
     @Override
     public void onClick(View v) {
         // Add new Room dialog here
+        Room newRoom = new Room();
+        newRoom.setPropertyID(111);
+        newRoom.setName("Property from Android");
+
+        espcService.addNewRoom(newRoom).enqueue(new Callback<Room>() {
+            @Override
+            public void onResponse(Call<Room> call, Response<Room> response) {
+
+                if(response.isSuccessful()){
+                    Log.d(TAG, "onResponse add a new room: " + response.body().toString());
+                }
+
+               getAllPropertyRooms();
+            }
+
+            @Override
+            public void onFailure(Call<Room> call, Throwable t) {
+                Log.e(TAG,"Add a new Room" + t.toString());
+            }
+        });
 
     }
 }
