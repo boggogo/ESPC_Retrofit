@@ -1,10 +1,15 @@
 package xdesign.georgi.espc_retrofit.UI;
 
+import android.annotation.TargetApi;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
@@ -33,6 +38,8 @@ import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
+import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
+import xdesign.georgi.espc_retrofit.EspcJobSheculerService;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -47,7 +54,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static ArrayList<Property> mProperties = new ArrayList<>();
     public static ArrayList<UserPropertyRating> mPropertyUserRatings = new ArrayList<>();
     private static int userId = -1;
-    private static PropertyAdapter mAdapter;
+    public static PropertyAdapter mAdapter;
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
 
@@ -57,24 +64,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private FloatingActionButton addNewPropertyFAB;
     private static SwipeRefreshLayout mRefreshLayout;
 
+    private static EspcItemDataSource mPropertyItemDataSource;
+
+    private JobScheduler mJobScheduler;
 
     //    private TextView textView;
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
         Log.e(TAG, "onCreate - MainActivity");
+
+        mJobScheduler = (JobScheduler) getSystemService( Context.JOB_SCHEDULER_SERVICE );
+
+        JobInfo.Builder builder = new JobInfo.Builder( 1, new ComponentName( getPackageName(), EspcJobSheculerService.class.getName() ) );
+
+        // 10 seconds intervals
+        builder.setPeriodic( 15 * 1000 );
+
+        JobInfo ji =  builder.build();
+        mJobScheduler.schedule(ji);
 
         mEmptyTextView = (TextView)findViewById(R.id.empty);
 
         mRefreshLayout = (SwipeRefreshLayout) findViewById(R.id.swipe_refresh_layout);
         mRefreshLayout.setOnRefreshListener(this);
-
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mPreferences.edit();
+        setUpFabButton();
+        mPropertyItemDataSource = new EspcItemDataSource(this);
+        mPropertyItemDataSource.open();
 
 //         Check if the user is logged in
         if (!mPreferences.getBoolean(Constants.IS_USER_LOGGED_IN, false)) {
@@ -93,13 +115,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         espcService = ESPCService.retrofit.create(ESPCService.class);
 
-        refetchPropertiesFromBackend();
-
-        setUpFabButton();
+//        refetchPropertiesFromBackend();
 
 
         mAdapter = new PropertyAdapter(this, mProperties, mPropertyUserRatings);
 
+        getDataFromTheLocalDB();
 
         mRecyclerView = (RecyclerView) findViewById(R.id.listView);
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getApplicationContext()));
@@ -109,24 +130,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     }
 
+
+
     @Override
     protected void onResume() {
         super.onResume();
         Log.d(TAG,"List size: " + mProperties.size());
 
         mAdapter.notifyDataSetChanged();
+//        if(mPropertyItemDataSource != null){
+//            mPropertyItemDataSource.open();
+//        }
     }
 
-    private void setUpFabButton() {
-        // set up addNewPropertyFAB button
-        addNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
-        // Change the color of the fab icon to white...
-        Drawable fabDrawable = addNewPropertyFAB.getDrawable();
-        DrawableCompat.setTint(fabDrawable, Color.WHITE);
-        // set up the onClickListener...
-        if (addNewPropertyFAB != null)
-            addNewPropertyFAB.setOnClickListener(this);
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        mPropertyItemDataSource.close();
+        mJobScheduler.cancelAll();
     }
+
+    public static void getDataFromTheLocalDB() {
+        mProperties.clear();
+        mProperties.addAll(mPropertyItemDataSource.getAllPropertyItems());
+        mAdapter.notifyDataSetChanged();
+        mRefreshLayout.setRefreshing(false);
+    }
+
 
     private void refetchPropertiesFromBackend() {
         mProperties.clear();
@@ -151,10 +182,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
         Log.e(TAG, "onResponse get all properties. Success: " + response.isSuccessful());
-        mProperties.addAll(response.body());
-        mAdapter.notifyDataSetChanged();
-
-
+        if(response.isSuccessful()) {
+            for (Property p : response.body()) {
+                // Store the property in the database...
+                // TODO DO SYNC LOGIC HERE IN A worker thread
+                mPropertyItemDataSource.createPropertyItem(p);
+            }
+            // read from the database and add the list to the adapter's list...
+            mProperties.addAll(mPropertyItemDataSource.getAllPropertyItems());
+            // notify the adapter for the change...
+            mAdapter.notifyDataSetChanged();
+        }
+        // Get all of the userPropertyRatings now after that we got the lit of properties
         espcService.getAllUserPropertyRatings().enqueue(new Callback<List<UserPropertyRating>>() {
             @Override
             public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
@@ -207,12 +246,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             refetchThisUserPropertiesFromBackend();
         }
 
+        if(id == R.id.action_reset_db){
+            mPropertyItemDataSource.deleteAll();
+        }
+
         return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onRefresh() {
-        refetchPropertiesFromBackend();
+//        refetchPropertiesFromBackend();
+        getDataFromTheLocalDB();
     }
 
     public void onPositiveAddNewProperty(String address, String price, final Context context) {
@@ -313,6 +357,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private void showErrorToast(String errorMessage) {
         Toast.makeText(MainActivity.this, errorMessage, Toast.LENGTH_LONG).show();
+    }
+    private void setUpFabButton() {
+        // set up addNewPropertyFAB button
+        addNewPropertyFAB = (FloatingActionButton) findViewById(R.id.fab);
+        // Change the color of the fab icon to white...
+        Drawable fabDrawable = addNewPropertyFAB.getDrawable();
+        DrawableCompat.setTint(fabDrawable, Color.WHITE);
+        // set up the onClickListener...
+        if (addNewPropertyFAB != null)
+            addNewPropertyFAB.setOnClickListener(this);
     }
 
     public void onPositiveUpdatePropertyDetails(final int propertyToBeUpdatedIndex, String newPropAddress, String newPropPrice) {

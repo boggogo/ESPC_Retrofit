@@ -40,4 +40,5 @@
     <string name="error_show_toast_cant_update_prop">Not authorized to update this property!</string>
     <string name="action_seatch">Search</string>
     <string name="toast_error_updating_room_details">Failed updating room details</string>
+    <string name="action_reset_database">Reset db</string>
 </resources>

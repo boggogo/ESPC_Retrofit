@@ -1,7 +1,11 @@
 package xdesign.georgi.espc_retrofit.Backend;
 
+import android.annotation.TargetApi;
+import android.os.Build;
+
 import java.io.Serializable;
-import java.math.BigInteger;
+import java.util.Comparator;
+import java.util.Objects;
 
 /**
  * Created by georgi on 14/06/16.
@@ -12,6 +16,7 @@ public class Property implements Serializable{
     private int userID;
     private String address;
     private String price;
+    private String lastUpdated;
 
     public int getUserID() {
         return userID;
@@ -45,12 +50,37 @@ public class Property implements Serializable{
         this.price = price;
     }
 
+    public String getLastUpdated() {
+        return lastUpdated;
+    }
+
+    public void setLastUpdated(String lastUpdated) {
+        this.lastUpdated = lastUpdated;
+    }
+
     @Override
     public String toString() {
         return "Property{" +
                 "id=" + id +
+                ", userID=" + userID +
                 ", address='" + address + '\'' +
-                ", price=" + price +
+                ", price='" + price + '\'' +
+                ", lastUpdated='" + lastUpdated + '\'' +
                 '}';
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Property prop = (Property) o;
+        return Objects.equals(id, prop.getId());
+    }
+
+    @TargetApi(Build.VERSION_CODES.KITKAT)
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }

@@ -29,4 +29,11 @@
         android:orderInCategory="400"
         android:icon="@drawable/search_icon"
         app:showAsAction="always" />
+
+    <item
+        android:title="@string/action_reset_database"
+        android:id="@+id/action_reset_db"
+        android:orderInCategory="500"
+        android:icon="@drawable/search_icon"
+        app:showAsAction="never" />
 </menu>
