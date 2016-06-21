@@ -110,7 +110,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
 
             }
-// TODO WORK ON THAT
+
             mPropertyItemDataSource.retainAllLocalFromRemote(response.body());
 
             MainActivity.getDataFromTheLocalDB();
