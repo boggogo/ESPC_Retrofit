@@ -127,19 +127,22 @@ public class EspcItemDataSource {
     /***
      * Method to check if an entry already exists in the db
      *
-     * @param property
+     * @param remoteProperty
      * @return
      */
-    public boolean ifExistsLocally(Property property) {
+    public boolean ifExistsLocally(Property remoteProperty) {
         ArrayList<Property> properties = getAllPropertyItems();
         for (Property p : properties) {
-            if (p.getId() == property.getId()) {
+            if (p.getId() == remoteProperty.getId()) {
                 return true;
             }
         }
         return false;
     }
 
+//    public boolean ifExistsRemotely(Property localProperty, ArrayList<Property> remoteProperties) {
+//       return (remoteProperties.contains(localProperty));
+//    }
     public void retainAllLocalFromRemote(List<Property> remoteProperties) {
         ArrayList<Property> localProperties = getAllPropertyItems();
         Log.d(TAG, "Local db size: " + localProperties.size());

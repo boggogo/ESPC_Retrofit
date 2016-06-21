@@ -9,6 +9,7 @@ import android.os.Message;
 import android.util.Log;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -123,8 +124,42 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                 }
 
             }
+            // Check if there is something to sync from local...
+            if(MainActivity.isUpdatePending){
+                // upload local to remote
+                Log.e(TAG,"Update is pending. Upload local to server...");
+                ArrayList<Property> localProperties  = mPropertyItemDataSource.getAllPropertyItems();
 
-            mPropertyItemDataSource.retainAllLocalFromRemote(response.body());
+                // Loop locals and check if a local Property exists in the remote list.
+                for(int i = 0; i < localProperties.size(); i++){
+                    // if it does not exists
+                    if(!(response.body().contains(localProperties.get(i)))){
+                        // upload it to the server
+                        Log.d(TAG,"Uploading local property: " + localProperties.get(i).toString());
+                        espcService.addNewProperty(localProperties.get(i)).enqueue(new Callback<Property>() {
+                            @Override
+                            public void onResponse(Call<Property> call, Response<Property> response) {
+                                Log.d(TAG,"Uploading local property onResponse: " + response.isSuccessful());
+                                // upon successful upload set the pending upload to false -> there is nothing to upload now.
+                                MainActivity.isUpdatePending = false;
+                            }
+
+                            @Override
+                            public void onFailure(Call<Property> call, Throwable t) {
+                                Log.d(TAG,"Uploading local property onFailure: " + t.toString());
+                                // upon unsuccessful upload set the pending upload to true -> try again.
+                                MainActivity.isUpdatePending = true;
+                            }
+                        });
+                    }
+                }
+
+
+            }else {
+                Log.e(TAG,"Update is NOT pending. Clean up/delete local content...");
+                // update is not pending so retainAll considering the remote data...
+                mPropertyItemDataSource.retainAllLocalFromRemote(response.body());
+            }
 
 
 

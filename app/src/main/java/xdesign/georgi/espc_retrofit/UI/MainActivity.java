@@ -57,6 +57,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public static ArrayList<UserPropertyRating> mPropertyUserRatings = new ArrayList<>();
     private static int userId = -1;
     public static PropertyAdapter mAdapter;
+    public static boolean isUpdatePending = false;
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
 
@@ -271,43 +272,46 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // start refreshing...
         mRefreshLayout.setRefreshing(true);
 
-        mAdapter.notifyDataSetChanged();
-        // save the new property to the backend...
-        espcService.addNewProperty(newProperty).enqueue(new Callback<Property>() {
-            @Override
-            public void onResponse(Call<Property> call, Response<Property> response) {
-
-                if (response.isSuccessful() || response.body() != null) {
-                    // add the new property locally first...
-                    mProperties.add(newProperty);
-                    // refetch data from the backend (to get the new ids and delete with work at this point)
-                    refetchPropertiesFromBackend();
-
-                    mRefreshLayout.setRefreshing(false);
-                    Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
-                    Toast.makeText(context, "Successfully added new property", Toast.LENGTH_SHORT).show();
-
-
-                } else {
-                    showErrorToast(getString(R.string.error_add_new_property_toast_message));
-                }
-
-                mAdapter.notifyDataSetChanged();
-                mRefreshLayout.setRefreshing(false);
-
-//                if(mProperties.size() == 0){
-//                    mEmptyTextView.setVisibility(View.VISIBLE);
+//        mAdapter.notifyDataSetChanged();
+//        // save the new property to the backend...
+//        espcService.addNewProperty(newProperty).enqueue(new Callback<Property>() {
+//            @Override
+//            public void onResponse(Call<Property> call, Response<Property> response) {
+//
+//                if (response.isSuccessful() || response.body() != null) {
+//                    // add the new property locally first...
+        mProperties.add(newProperty);
+        mPropertyItemDataSource.createPropertyItem(newProperty);
+        mRefreshLayout.setRefreshing(false);
+        isUpdatePending = true;
+        // refetch data from the backend (to get the new ids and delete with work at this point)
+//                    refetchPropertiesFromBackend();
+//
+//                    mRefreshLayout.setRefreshing(false);
+//                    Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
+//                    Toast.makeText(context, "Successfully added new property", Toast.LENGTH_SHORT).show();
+//
+//
+//                } else {
+//                    showErrorToast(getString(R.string.error_add_new_property_toast_message));
 //                }
-            }
-
-
-            @Override
-            public void onFailure(Call<Property> call, Throwable t) {
-                mRefreshLayout.setRefreshing(false);
-                Log.e(TAG, "onFailure: error: " + t.toString());
-                showErrorToast(getString(R.string.error_add_new_property_toast_message));
-            }
-        });
+//
+        mAdapter.notifyDataSetChanged();
+//                mRefreshLayout.setRefreshing(false);
+//
+////                if(mProperties.size() == 0){
+////                    mEmptyTextView.setVisibility(View.VISIBLE);
+////                }
+//            }
+//
+//
+//            @Override
+//            public void onFailure(Call<Property> call, Throwable t) {
+//                mRefreshLayout.setRefreshing(false);
+//                Log.e(TAG, "onFailure: error: " + t.toString());
+//                showErrorToast(getString(R.string.error_add_new_property_toast_message));
+//            }
+//        });
 
     }
 
@@ -341,6 +345,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         if (count == 1) {
                             // success = > delete the local item from the list
                             mProperties.remove(property);
+                            mPropertyItemDataSource.deletePropertyItem(property);
                             mAdapter.notifyDataSetChanged();
                         } else {
                             // deletion failed
