@@ -99,6 +99,7 @@ public class EspcItemDataSource {
      * @param item object that contains the new data
      */
     public void updatePropertyItem(Property item) {
+        Log.d(TAG,"Updating property with id: " + item.getId());
         long id = item.getId();
         ContentValues values = new ContentValues();
         values.put(EspcSQLiteHelper.COLUMN_ID, item.getId());
@@ -141,16 +142,10 @@ public class EspcItemDataSource {
 
     public void retainAllLocalFromRemote(List<Property> remoteProperties) {
         ArrayList<Property> localProperties = getAllPropertyItems();
-
-
         Log.d(TAG, "Local db size: " + localProperties.size());
         Log.d(TAG, "Remote db size: " + remoteProperties.size());
 
-        ArrayList<Property> differences = new ArrayList<>(localProperties);
-
         for (int i = 0; i < localProperties.size(); i++) {
-
-
             if (remoteProperties.contains(localProperties.get(i))) {
                 Log.d(TAG, "remote contains local property with id: " + localProperties.get(i).getId());
             } else {
@@ -158,15 +153,7 @@ public class EspcItemDataSource {
                 // delete it
                 deletePropertyItem(localProperties.get(i));
             }
-
-
         }
-
-//        Log.d(TAG, "differences list size: " + differences.size());
-
-//        Log.d(TAG, "differences list : " + differences.toString());
-
-
     }
 
     /**

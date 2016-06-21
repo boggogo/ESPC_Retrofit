@@ -73,17 +73,16 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
     public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
         Log.d(TAG, "onResponse get all properties. Success: " + response.isSuccessful());
         if (response.isSuccessful()) {
+
+            // Loop through the remote to check for updated content
             for (Property p : response.body()) {
                 // Store the property in the database...
                 Log.d(TAG, "Property with address: " + p.getAddress());
 
-
                 if (mPropertyItemDataSource.ifExistsLocally(p)) {
                     // entry exists locally. Check if needs updating...
                     Log.d(TAG, "// entry exists locally. Check if needs updating...");
-
                     Property localProperty = mPropertyItemDataSource.getPropertyItemById(p.getId());
-
                     Log.d(TAG, localProperty.toString());
 
                     long remoteTimeStamp = Long.parseLong(p.getLastUpdated());
@@ -94,11 +93,26 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
 
                     // check if local property lastUpdated equalst remote property last updated
-                    if(localDate.compareTo(remoteDate) == 0){
+                    if(localDate.equals(remoteDate)){
                         // two dates are equal
                         Log.d(TAG, "Two dates are equal. NO NEED to update");
+                    }else if(localDate.after(remoteDate)){
+                        Log.d(TAG,"Local data is the most recent -> Sync data with the server!");
+                        Call<Property> syncLocalCall = espcService.updatePropertyById(localProperty.getId(), localProperty);
+                        // upload data to the server...
+                        syncLocalCall.enqueue(new Callback<Property>() {
+                            @Override
+                            public void onResponse(Call<Property> call, Response<Property> response) {
+
+                            }
+
+                            @Override
+                            public void onFailure(Call<Property> call, Throwable t) {
+
+                            }
+                        });
                     }else{
-                        Log.d(TAG, "Two dates are NOT equal. Update performed!");
+                        Log.d(TAG, "Remote data is the most recent");
                         mPropertyItemDataSource.updatePropertyItem(p);
                     }
 
@@ -108,10 +122,11 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                     mPropertyItemDataSource.createPropertyItem(p);
                 }
 
-
             }
 
             mPropertyItemDataSource.retainAllLocalFromRemote(response.body());
+
+
 
             MainActivity.getDataFromTheLocalDB();
         }
