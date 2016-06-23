@@ -137,6 +137,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
            // for (UserPropertyRating ur : response.body()) {
                 mPropertyRatings.clear();
                 mPropertyRatings.addAll(response.body());
+            Log.d(TAG,response.body().toString());
                 //Log.d(TAG, "Rating: " + ur.toString());
            // }
         }

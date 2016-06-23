@@ -7,7 +7,7 @@ import java.io.Serializable;
  */
 public class UserPropertyRating implements Serializable{
     private int id;
-
+    private String uuid;
     public int getId() {
         return id;
     }
@@ -19,6 +19,15 @@ public class UserPropertyRating implements Serializable{
     private int userID;
     private int propertyID;
     private int overallRating;
+
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public int getUserID() {
         return userID;
@@ -47,7 +56,9 @@ public class UserPropertyRating implements Serializable{
     @Override
     public String toString() {
         return "UserPropertyRating{" +
-                "userID=" + userID +
+                "id=" + id +
+                ", uuid='" + uuid + '\'' +
+                ", userID=" + userID +
                 ", propertyID=" + propertyID +
                 ", overallRating=" + overallRating +
                 '}';
