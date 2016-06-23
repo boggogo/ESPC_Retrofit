@@ -3,14 +3,17 @@ package xdesign.georgi.espc_retrofit;
 import android.annotation.TargetApi;
 import android.app.job.JobParameters;
 import android.app.job.JobService;
+import android.content.SharedPreferences;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import retrofit2.Call;
@@ -18,27 +21,40 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Property;
+import xdesign.georgi.espc_retrofit.Backend.Sync;
 import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
+import xdesign.georgi.espc_retrofit.Utils.Constants;
 
 /**
  * Created by georgi on 20/06/16.
  */
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-public class EspcJobSheculerService extends JobService implements Callback<List<Property>> {
+public class EspcJobSheculerService extends JobService implements Callback<List<Sync>> {
     private static final String TAG = EspcJobSheculerService.class.getSimpleName();
     private EspcItemDataSource mPropertyItemDataSource;
     private static ESPCService espcService;
-    private Call<List<Property>> call;
+    private Call<List<Sync>> getAllSyncsCall;
+    private LinkedList<Sync> syncQueue;
+    private final String ACTION_CREATE = "create";
+    private final String ACTION_DELETE = "delete";
+    private final String ACTION_UPDATE = "update";
+    private final String TABLE_PROPERTY = "Property";
+    private SharedPreferences mPreferences;
+    private SharedPreferences.Editor mEditor;
+    private Call<List<Property>> getPropByUUIDCall;
 
     @Override
     public void onCreate() {
         super.onCreate();
         espcService = ESPCService.retrofit.create(ESPCService.class);
-        call = espcService.getAllProperties();
+        syncQueue = new LinkedList<Sync>();
 
         mPropertyItemDataSource = new EspcItemDataSource(getApplicationContext());
         mPropertyItemDataSource.open();
+
+        mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        mEditor = mPreferences.edit();
     }
 
     @Override
@@ -61,8 +77,16 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
             Toast.makeText(getApplicationContext(),
                     "JobService task running", Toast.LENGTH_SHORT)
                     .show();
+            // TODO get the stored in the shared prefereces timestamp - the last sync time
+            // 1466598611995L
+            Long lastSyncTime = 0L;
+            lastSyncTime = mPreferences.getLong(Constants.LAST_SYNC_TIME_KEY, lastSyncTime);
+            Log.d(TAG, "Last  sync time is: " + lastSyncTime);
+
             Log.e(TAG, "Job Service task is running...");
-            call.enqueue(EspcJobSheculerService.this);
+            getAllSyncsCall = espcService.getAllSyncsAfterThisTimeStamp(lastSyncTime);
+            // get all of the sync records that equal or are bigger than the local lastSyncTime...
+            getAllSyncsCall.enqueue(EspcJobSheculerService.this);
 
             jobFinished((JobParameters) msg.obj, false);
             return true;
@@ -70,105 +94,128 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
     });
 
+
     @Override
-    public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-        Log.d(TAG, "onResponse get all properties. Success: " + response.isSuccessful());
+    public void onResponse(Call<List<Sync>> call, Response<List<Sync>> response) {
+        Log.d(TAG, "onResponse success:" + response.isSuccessful());
+
         if (response.isSuccessful()) {
 
-            // Loop through the remote to check for updated content
-            for (Property p : response.body()) {
-                // Store the property in the database...
-                Log.d(TAG, "Property with address: " + p.getAddress());
+//            if(response.body().size() == 0){
+//                Log.e(TAG,"REMOTE SYNC TABLE SIZE IS 0 - resetting the local sync time to 0");
+//                mEditor.putLong(Constants.LAST_SYNC_TIME_KEY,0L).apply();
+//            }
 
-                if (mPropertyItemDataSource.ifExistsLocally(p)) {
-                    // entry exists locally. Check if needs updating...
-                    Log.d(TAG, "// entry exists locally. Check if needs updating...");
-                    Property localProperty = mPropertyItemDataSource.getPropertyItemById(p.getId());
-                    Log.d(TAG, localProperty.toString());
-
-                    long remoteTimeStamp = Long.parseLong(p.getLastUpdated());
-                    long localTimeStamp = Long.parseLong(localProperty.getLastUpdated());
-
-                    Date remoteDate = new Date(remoteTimeStamp);
-                    Date localDate = new Date(localTimeStamp);
-
-
-                    // check if local property lastUpdated equalst remote property last updated
-                    if(localDate.equals(remoteDate)){
-                        // two dates are equal
-                        Log.d(TAG, "Two dates are equal. NO NEED to update");
-                    }else if(localDate.after(remoteDate)){
-                        Log.d(TAG,"Local data is the most recent -> Sync data with the server!");
-                        Call<Property> syncLocalCall = espcService.updatePropertyById(localProperty.getId(), localProperty);
-                        // upload data to the server...
-                        syncLocalCall.enqueue(new Callback<Property>() {
-                            @Override
-                            public void onResponse(Call<Property> call, Response<Property> response) {
-
-                            }
-
-                            @Override
-                            public void onFailure(Call<Property> call, Throwable t) {
-
-                            }
-                        });
-                    }else{
-                        Log.d(TAG, "Remote data is the most recent");
-                        mPropertyItemDataSource.updatePropertyItem(p);
-                    }
-
-                } else {
-                    // entry does not exists locally. Create it...
-                    Log.d(TAG, "entry does not exists locally. Create it...");
-                    mPropertyItemDataSource.createPropertyItem(p);
-                }
-
-            }
-            // Check if there is something to sync from local...
-            if(MainActivity.isUpdatePending){
-                // upload local to remote
-                Log.e(TAG,"Update is pending. Upload local to server...");
-                ArrayList<Property> localProperties  = mPropertyItemDataSource.getAllPropertyItems();
-
-                // Loop locals and check if a local Property exists in the remote list.
-                for(int i = 0; i < localProperties.size(); i++){
-                    // if it does not exists
-                    if(!(response.body().contains(localProperties.get(i)))){
-                        // upload it to the server
-                        Log.d(TAG,"Uploading local property: " + localProperties.get(i).toString());
-                        espcService.addNewProperty(localProperties.get(i)).enqueue(new Callback<Property>() {
-                            @Override
-                            public void onResponse(Call<Property> call, Response<Property> response) {
-                                Log.d(TAG,"Uploading local property onResponse: " + response.isSuccessful());
-                                // upon successful upload set the pending upload to false -> there is nothing to upload now.
-                                MainActivity.isUpdatePending = false;
-                            }
-
-                            @Override
-                            public void onFailure(Call<Property> call, Throwable t) {
-                                Log.d(TAG,"Uploading local property onFailure: " + t.toString());
-                                // upon unsuccessful upload set the pending upload to true -> try again.
-                                MainActivity.isUpdatePending = true;
-                            }
-                        });
-                    }
-                }
-
-
-            }else {
-                Log.e(TAG,"Update is NOT pending. Clean up/delete local content...");
-                // update is not pending so retainAll considering the remote data...
-                mPropertyItemDataSource.retainAllLocalFromRemote(response.body());
+            for (Sync c : response.body()) {
+                syncQueue.add(c);
+                Log.d(TAG, c.toString());
             }
 
 
-
-            MainActivity.getDataFromTheLocalDB();
         }
+
+        Iterator<Sync> syncIterator = syncQueue.iterator();
+        Log.d(TAG, "Iterating over linked list===============================");
+
+        while (syncIterator.hasNext()) {
+//            Log.d(TAG,syncIterator.next().toString());
+            Sync c = syncIterator.next();
+
+            String uuid = c.getUuid();
+
+            Log.d(TAG, c.toString());
+            // Check which table that the change occur in...
+            if (c.getTable().equals(TABLE_PROPERTY)) {
+                Log.d(TAG, "Table: Property");
+// check what action to do in the local database...
+                switch (c.getAction()) {
+                    case ACTION_CREATE:
+                        Log.d(TAG, "action - create");
+                        // create a new record in the local database but first we have to cherry pick the record from the remote api
+
+
+                        // get the record from Property table with this uuid...
+                        getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
+
+                        getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
+                            @Override
+                            public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
+                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
+                                if (response.isSuccessful()) {
+                                    for (Property p : response.body()) {
+                                        Log.d(TAG, p.toString());
+                                        // create new property locally as well.
+                                        mPropertyItemDataSource.createPropertyItem(p);
+                                        // refresh the screen with the latest data from the local db...
+                                        MainActivity.getDataFromTheLocalDB();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<Property>> call, Throwable t) {
+                                Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
+                            }
+                        });
+                        break;
+
+                    case ACTION_DELETE:
+                        Log.d(TAG, "action - delete");
+                        // loop through the local db and find the property with the uuid that needs to be deleted
+
+                        ArrayList<Property> localProperties = mPropertyItemDataSource.getAllPropertyItems();
+
+                        for (Property p : localProperties) {
+                            if (p.getUuid().equals(uuid)) {
+                                // delete it
+                                Log.d(TAG, "Deleting property: " + p.toString());
+                                mPropertyItemDataSource.deletePropertyItem(p);
+                                // refresh the screen with the latest data from the local db...
+                                MainActivity.getDataFromTheLocalDB();
+                            }
+                        }
+
+                        break;
+
+                    case ACTION_UPDATE:
+                        Log.d(TAG,"action - update");
+                        // get the record from Property table with this uuid...
+                        getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
+                        getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
+                            @Override
+                            public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
+                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
+                                if (response.isSuccessful()) {
+                                    for (Property p : response.body()) {
+                                        Log.d(TAG, p.toString());
+                                        // create new property locally as well.
+                                        mPropertyItemDataSource.updatePropertyItem(p);
+                                        // refresh the screen with the latest data from the local db...
+                                        MainActivity.getDataFromTheLocalDB();
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<Property>> call, Throwable t) {
+                                Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
+                            }
+                        });
+                        break;
+                }
+
+            }
+
+
+            mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getTimeChanged()).apply();
+        }
+//        Log.d(TAG,syncQueue.peek().toString());
+
+
     }
 
     @Override
-    public void onFailure(Call<List<Property>> call, Throwable t) {
-        Log.e(TAG, "onFailure error: " + t.toString());
+    public void onFailure(Call<List<Sync>> call, Throwable t) {
+        Log.e(TAG, "onFailure error" + t.toString());
     }
 }

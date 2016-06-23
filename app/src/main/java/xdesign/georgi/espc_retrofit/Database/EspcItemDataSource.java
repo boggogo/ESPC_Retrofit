@@ -27,6 +27,7 @@ public class EspcItemDataSource {
     // string array of all database columns
     private String[] allColumns = {
             EspcSQLiteHelper.COLUMN_ID,
+            EspcSQLiteHelper.COLUMN_UUID,
             EspcSQLiteHelper.COLUMN_PRICE,
             EspcSQLiteHelper.COLUMN_ADDRESS,
             EspcSQLiteHelper.COLUMN_USER_ID,
@@ -72,6 +73,7 @@ public class EspcItemDataSource {
         values.put(EspcSQLiteHelper.COLUMN_ID, item.getId());
         values.put(EspcSQLiteHelper.COLUMN_ADDRESS, item.getAddress());
         values.put(EspcSQLiteHelper.COLUMN_PRICE, item.getPrice());
+        values.put(EspcSQLiteHelper.COLUMN_UUID, item.getUuid());
         values.put(EspcSQLiteHelper.COLUMN_USER_ID, item.getUserID());
         values.put(EspcSQLiteHelper.COLUMN_LAST_UPDATED, item.getLastUpdated());
 
@@ -103,6 +105,7 @@ public class EspcItemDataSource {
         long id = item.getId();
         ContentValues values = new ContentValues();
         values.put(EspcSQLiteHelper.COLUMN_ID, item.getId());
+        values.put(EspcSQLiteHelper.COLUMN_UUID, item.getUuid());
         values.put(EspcSQLiteHelper.COLUMN_ADDRESS, item.getAddress());
         values.put(EspcSQLiteHelper.COLUMN_PRICE, item.getPrice());
         values.put(EspcSQLiteHelper.COLUMN_USER_ID, item.getUserID());
@@ -143,21 +146,21 @@ public class EspcItemDataSource {
 //    public boolean ifExistsRemotely(Property localProperty, ArrayList<Property> remoteProperties) {
 //       return (remoteProperties.contains(localProperty));
 //    }
-    public void retainAllLocalFromRemote(List<Property> remoteProperties) {
-        ArrayList<Property> localProperties = getAllPropertyItems();
-        Log.d(TAG, "Local db size: " + localProperties.size());
-        Log.d(TAG, "Remote db size: " + remoteProperties.size());
-
-        for (int i = 0; i < localProperties.size(); i++) {
-            if (remoteProperties.contains(localProperties.get(i))) {
-                Log.d(TAG, "remote contains local property with id: " + localProperties.get(i).getId());
-            } else {
-                Log.d(TAG, "remote DO NOT contains local property with id: " + localProperties.get(i).getId() + " so DELETE IT");
-                // delete it
-                deletePropertyItem(localProperties.get(i));
-            }
-        }
-    }
+//    public void retainAllLocalFromRemote(List<Property> remoteProperties) {
+//        ArrayList<Property> localProperties = getAllPropertyItems();
+//        Log.d(TAG, "Local db size: " + localProperties.size());
+//        Log.d(TAG, "Remote db size: " + remoteProperties.size());
+//
+//        for (int i = 0; i < localProperties.size(); i++) {
+//            if (remoteProperties.contains(localProperties.get(i))) {
+//                Log.d(TAG, "remote contains local property with id: " + localProperties.get(i).getId());
+//            } else {
+//                Log.d(TAG, "remote DO NOT contains local property with id: " + localProperties.get(i).getId() + " so DELETE IT");
+//                // delete it
+//                deletePropertyItem(localProperties.get(i));
+//            }
+//        }
+//    }
 
     /**
      * Method that deletes an entry in the database
@@ -237,14 +240,16 @@ public class EspcItemDataSource {
         Property item = new Property();
         //set up the id using the cursor
         item.setId(cursor.getInt(0));
+        //set up the uuid using the cursor
+        item.setUuid(cursor.getString(1));
         //set up the description
-        item.setPrice(cursor.getString(1));
+        item.setPrice(cursor.getString(2));
         //set up the title using
-        item.setAddress(cursor.getString(2));
+        item.setAddress(cursor.getString(3));
         //set up the publication date
-        item.setUserID(cursor.getInt(3));
+        item.setUserID(cursor.getInt(4));
         // set up the last updated date
-        item.setLastUpdated(cursor.getString(4));
+        item.setLastUpdated(cursor.getString(5));
         //return the item
         return item;
     }
@@ -265,6 +270,7 @@ public class EspcItemDataSource {
         Property propertyItem = new Property();
         //set up the object using the cursor object...
         propertyItem.setId(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_ID)));
+        propertyItem.setUuid(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_UUID)));
         propertyItem.setUserID(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_USER_ID)));
         propertyItem.setAddress(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_ADDRESS)));
         propertyItem.setPrice(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_PRICE)));

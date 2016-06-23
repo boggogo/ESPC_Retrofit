@@ -85,8 +85,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(getPackageName(), EspcJobSheculerService.class.getName()));
 
-        // 10 seconds intervals
-        builder.setPeriodic(15 * 1000);
+        // 60 seconds intervals
+        builder.setPeriodic(60 * 1000);
 
         JobInfo ji = builder.build();
         mJobScheduler.schedule(ji);

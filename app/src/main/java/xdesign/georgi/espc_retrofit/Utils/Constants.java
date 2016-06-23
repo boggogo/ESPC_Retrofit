@@ -14,5 +14,7 @@ public class Constants {
 
     public static final String USER_ID_KEY = "user_id_key";
 
+    public static final String LAST_SYNC_TIME_KEY = "last_sync_time";
+
 
 }
