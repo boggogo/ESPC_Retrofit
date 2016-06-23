@@ -9,6 +9,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -84,7 +86,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mJobScheduler = (JobScheduler) getSystemService(Context.JOB_SCHEDULER_SERVICE);
 
         JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(getPackageName(), EspcJobSheculerService.class.getName()));
-
         // 60 seconds intervals
         builder.setPeriodic(60 * 1000);
 
@@ -255,10 +256,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
+//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onRefresh() {
-//        refetchPropertiesFromBackend();
-        getDataFromTheLocalDB();
+//        if(isWifiAwailable()){
+//            int jobID = 2;
+//            JobInfo.Builder builder = new JobInfo.Builder(jobID, new ComponentName(getPackageName(), EspcJobSheculerService.class.getName()));
+//            builder.set
+//            JobInfo oneTimeJobInfo = builder.build();
+//            mJobScheduler.schedule(oneTimeJobInfo);
+//            mJobScheduler.cancel(jobID);
+//            mRefreshLayout.setRefreshing(false);
+//        }else {
+//            Toast.makeText(this,"No connection! Reading from local db...", Toast.LENGTH_LONG).show();
+            getDataFromTheLocalDB();
+//        }
     }
 
     public void onPositiveAddNewProperty(String address, String price, final Context context) {
@@ -408,5 +420,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private boolean isWifiAwailable(){
+        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+
+        NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
+        return (activeNetwork != null &&
+                activeNetwork.isConnectedOrConnecting());
+
+    }
 
 }

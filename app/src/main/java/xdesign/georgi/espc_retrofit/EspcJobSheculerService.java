@@ -59,8 +59,13 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        mJobHandler.sendMessage(Message.obtain(mJobHandler, 1, params));
-        return true;
+        if(params.getJobId() == 1) {
+            mJobHandler.sendMessage(Message.obtain(mJobHandler, 1, params));
+            return true;
+        }
+
+
+        return false;
     }
 
     @Override
@@ -77,7 +82,6 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
             Toast.makeText(getApplicationContext(),
                     "JobService task running", Toast.LENGTH_SHORT)
                     .show();
-            // TODO get the stored in the shared prefereces timestamp - the last sync time
             // 1466598611995L
             Long lastSyncTime = 0L;
             lastSyncTime = mPreferences.getLong(Constants.LAST_SYNC_TIME_KEY, lastSyncTime);
