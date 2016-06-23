@@ -40,6 +40,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
     private final String ACTION_DELETE = "delete";
     private final String ACTION_UPDATE = "update";
     private final String TABLE_PROPERTY = "Property";
+    private final String TABLE_USER_PROPERTY_RATING = "UserPropertyRating";
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
     private Call<List<Property>> getPropByUUIDCall;
@@ -208,6 +209,11 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                         break;
                 }
 
+            }
+
+            if(c.getTable().equals(TABLE_USER_PROPERTY_RATING)){
+                Log.d(TAG, "Table: TABLE_USER_PROPERTY_RATING");
+                //// TODO: 23/06/16  implement sync for UserPropertyRating table as well
             }
 
 
