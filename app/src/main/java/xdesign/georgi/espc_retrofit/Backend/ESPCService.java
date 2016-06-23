@@ -53,6 +53,9 @@ public interface ESPCService {
     @PUT("Properties/{id}")
     Call<Property> updatePropertyById(@Path("id") int id, @Body Property property);
 
+    @GET ("Properties/getPropertyByUUID")
+    Call<List<Property>> getPropertyByUUID(@Query(("uuidPr")) String uuid);
+
     //=============================================== User Methods =============================================
     @GET("User_ESPCs")
     Call<List<User_ESPC>> getAllUsers();
@@ -93,6 +96,13 @@ public interface ESPCService {
 
     @DELETE("UserPropertyRatings/{id}")
     Call<HashMap<String, Integer>> deletePropertyRatingById(@Path("id") int id);
+
+    //=============================================== Sync Methods =============================================
+    @GET("Syncs")
+    Call<List<Sync>> getAllSyncs();
+
+    @GET("Syncs/getRecodsAfterTimestamp")
+    Call<List<Sync>> getAllSyncsAfterThisTimeStamp(@Query(("timeChanged")) long timeChanged);
 
     //=============================================== Backend Base URL =============================================
     public static final Retrofit retrofit = new Retrofit.Builder()

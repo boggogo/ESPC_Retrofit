@@ -17,6 +17,16 @@ public class Property implements Serializable{
     private String address;
     private String price;
     private String lastUpdated;
+    private String uuid;
+
+
+    public String getUuid() {
+        return uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
 
     public int getUserID() {
         return userID;
@@ -66,6 +76,7 @@ public class Property implements Serializable{
                 ", address='" + address + '\'' +
                 ", price='" + price + '\'' +
                 ", lastUpdated='" + lastUpdated + '\'' +
+                ", uuid='" + uuid + '\'' +
                 '}';
     }
 

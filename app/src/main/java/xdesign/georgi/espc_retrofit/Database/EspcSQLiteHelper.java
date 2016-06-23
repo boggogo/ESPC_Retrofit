@@ -19,6 +19,8 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
     public static final String COLUMN_ADDRESS = "address";
     //name of the column publication date
     public static final String COLUMN_USER_ID = "userID";
+    // name of the column uuid
+    public static final String COLUMN_UUID = "uuid";
     //file name of the database
     public static final String COLUMN_LAST_UPDATED = "lastUpdated";
     private static final String DATABASE_NAME = "espc.db";
@@ -28,6 +30,7 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
     // Database creation sql statement
     private static final String DATABASE_CREATE = "create table "
             + TABLE_NAME + "( " + COLUMN_ID + " integer primary key autoincrement, "
+            + COLUMN_UUID + " text, "
             + COLUMN_PRICE + " text, "
             + COLUMN_ADDRESS + " text, "
             + COLUMN_USER_ID + " integer, "
