@@ -239,6 +239,27 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                         });
                         break;
 
+                    case ACTION_UPDATE:
+                        Log.d(TAG,"ACTION_UPDATE");
+                        getUsPropRtByUUIDCall = espcService.getUserPropertyRatingByUUID(c.getUuid());
+                        getUsPropRtByUUIDCall.enqueue(new Callback<List<UserPropertyRating>>() {
+                            @Override
+                            public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
+                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting user property rating by uuid");
+                                if(response.isSuccessful()){
+                                    for(UserPropertyRating upr:response.body()){
+                                        mPropertyItemDataSource.updateUserPropertyRatingItem(upr);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
+                                Log.e(TAG, "onFailure getting user property rating by uuid");
+                            }
+                        });
+                        break;
+
                     case ACTION_DELETE:
                         Log.d(TAG, "ACTION_DELETE");
                         ArrayList<UserPropertyRating> userPropertyRatings = mPropertyItemDataSource.getAllUserPropertyRatingItems();

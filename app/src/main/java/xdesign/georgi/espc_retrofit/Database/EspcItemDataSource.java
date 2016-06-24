@@ -171,6 +171,24 @@ public class EspcItemDataSource {
         );
     }
 
+    public void updateUserPropertyRatingItem(UserPropertyRating upr) {
+        Log.d(TAG, "Updating UPR with id: " + upr.getId());
+        long id = upr.getId();
+        ContentValues values = new ContentValues();
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_ID, upr.getId());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_UUID, upr.getUuid());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_USER_ID, upr.getUserID());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_PROPERTY_ID, upr.getPropertyID());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_OVERALL_RATING, upr.getOverallRating());
+
+        mDatabase.update(
+                EspcSQLiteHelper.USER_PROPERTY_RATING_TABLE_NAME,
+                values,
+                "id=?",
+                new String[]{"" + id}
+        );
+    }
+
     public Property getPropertyItemById(int id) {
         Cursor cursor = mDatabase.query(EspcSQLiteHelper.PROPERTY_TABLE_NAME, allPropertyColumns, EspcSQLiteHelper.PROPERTY_COLUMN_ID + " =? ",
                 new String[]{id + ""}, null, null, null, null);
