@@ -6,7 +6,6 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -15,7 +14,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +28,7 @@ import xdesign.georgi.espc_retrofit.Adapters.UserPropertyRatingsAdapter;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
+import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyRatingDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -47,6 +46,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
     private UserPropertyRatingsAdapter mAdapter;
     private RecyclerView mRecyclerView;
     private TextView mEmptyTextView;
+    private EspcItemDataSource mEpcItemDataSource;
 
 
 
@@ -64,6 +64,8 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        mEpcItemDataSource = EspcItemDataSource.getInstance(getApplicationContext());
+        mEpcItemDataSource.open();
 
         mEmptyTextView = (TextView)findViewById(R.id.empty);
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -86,8 +88,8 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         mRecyclerView.addItemDecoration(new DividerItemDecoration(this, null));
         mRecyclerView.setAdapter(mAdapter);
 
-        getDataFromBackend();
-
+//        getDataFromBackend();
+        getDataFromLocalDB();
 
 
         setUpFabButton();
@@ -100,16 +102,57 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
     protected void onResume() {
         super.onResume();
         Log.d(TAG,"OnResume called");
-        getDataFromBackend();
+//        getDataFromBackend();
+        getDataFromLocalDB();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if(mEpcItemDataSource != null)
+        mEpcItemDataSource.close();
     }
 
     private void getDataFromBackend() {
 
         Call<List<UserPropertyRating>> userRatingsCall = espcService.getAllPropRatingsAssociatedWithPropId(propertyId);
         userRatingsCall.enqueue(this);
+
     }
 
-    private Callback<List<User_ESPC>> getPropertyRatingCallback = new Callback<List<User_ESPC>>() {
+    private void getDataFromLocalDB(){
+        mPropertyRatings.clear();
+        mPropertyRatings.addAll(mEpcItemDataSource.getAllPropertyRatingsAssociatedWithPropertyId(propertyId));
+
+        if(mPropertyRatings.size() == 0){
+            mEmptyTextView.setVisibility(View.VISIBLE);
+        }
+        espcService.getAllUsers().enqueue(getPropertyRatingForTheSignedUserCallback);
+    }
+
+
+
+    @Override
+    public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response){
+        Log.d(TAG,"onResponse");
+        if(response.isSuccessful()) {
+            Log.d(TAG,"onResponse user ratings list size: " + response.body().size());
+           // for (UserPropertyRating ur : response.body()) {
+                mPropertyRatings.clear();
+                mPropertyRatings.addAll(response.body());
+            Log.d(TAG,response.body().toString());
+                //Log.d(TAG, "Rating: " + ur.toString());
+           // }
+        }
+        Log.d(TAG,"List size: " + mPropertyRatings.size());
+        if(mPropertyRatings.size() == 0){
+            mEmptyTextView.setVisibility(View.VISIBLE);
+        }
+        espcService.getAllUsers().enqueue(getPropertyRatingForTheSignedUserCallback);
+
+    }
+
+    private Callback<List<User_ESPC>> getPropertyRatingForTheSignedUserCallback = new Callback<List<User_ESPC>>() {
         @Override
         public void onResponse(Call<List<User_ESPC>> call, Response<List<User_ESPC>> response) {
             Log.d(TAG,"onResponse getting all users...");
@@ -128,28 +171,6 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             Log.e(TAG,"onFailure getting all users");
         }
     };
-
-    @Override
-    public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response){
-        Log.d(TAG,"onResponse");
-        if(response.isSuccessful()) {
-            Log.d(TAG,"onResponse user ratings list size: " + response.body().size());
-           // for (UserPropertyRating ur : response.body()) {
-                mPropertyRatings.clear();
-                mPropertyRatings.addAll(response.body());
-            Log.d(TAG,response.body().toString());
-                //Log.d(TAG, "Rating: " + ur.toString());
-           // }
-        }
-        Log.d(TAG,"List size: " + mPropertyRatings.size());
-        if(mPropertyRatings.size() == 0){
-            mEmptyTextView.setVisibility(View.VISIBLE);
-        }
-        espcService.getAllUsers().enqueue(getPropertyRatingCallback);
-
-//        mRefreshLayout.setRefreshing(false);
-//        mAdapter.notifyDataSetChanged();
-    }
 
     @Override
     public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
@@ -183,7 +204,8 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     @Override
     public void onRefresh() {
-        getDataFromBackend();
+//        getDataFromBackend();
+        getDataFromLocalDB();
     }
 
     public void onPositiveAddPropertyRating(int selectedValue) {

@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         JobInfo.Builder builder = new JobInfo.Builder(1, new ComponentName(getPackageName(), EspcJobSheculerService.class.getName()));
         // 60 seconds intervals
-        builder.setPeriodic(60 * 1000);
+        builder.setPeriodic(10 * 1000);
 
         JobInfo ji = builder.build();
         mJobScheduler.schedule(ji);
@@ -99,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         mEditor = mPreferences.edit();
         setUpFabButton();
-        mPropertyItemDataSource = new EspcItemDataSource(this);
+        mPropertyItemDataSource = EspcItemDataSource.getInstance(getApplicationContext());
         mPropertyItemDataSource.open();
 
 //         Check if the user is logged in

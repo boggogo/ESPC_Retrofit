@@ -8,9 +8,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
+import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 
 /**
  * EspcItemDataSource class that encapsulates the database object
@@ -24,15 +24,36 @@ public class EspcItemDataSource {
     private SQLiteDatabase mDatabase;
     // RssFeedSQLiteHelper object
     private EspcSQLiteHelper mDbHelper;
-    // string array of all database columns
-    private String[] allColumns = {
-            EspcSQLiteHelper.COLUMN_ID,
-            EspcSQLiteHelper.COLUMN_UUID,
-            EspcSQLiteHelper.COLUMN_PRICE,
-            EspcSQLiteHelper.COLUMN_ADDRESS,
-            EspcSQLiteHelper.COLUMN_USER_ID,
-            EspcSQLiteHelper.COLUMN_LAST_UPDATED
+    // string array of all Property table columns
+    private String[] allPropertyColumns = {
+            EspcSQLiteHelper.PROPERTY_COLUMN_ID,
+            EspcSQLiteHelper.PROPERTY_COLUMN_UUID,
+            EspcSQLiteHelper.PROPERTY_COLUMN_PRICE,
+            EspcSQLiteHelper.PROPERTY_COLUMN_ADDRESS,
+            EspcSQLiteHelper.PROPERTY_COLUMN_USER_ID,
+            EspcSQLiteHelper.PROPERTY_COLUMN_LAST_UPDATED
     };
+
+    private String[] allUserPropertyRatingColumns = {
+            EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_ID,
+            EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_UUID,
+            EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_USER_ID,
+            EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_PROPERTY_ID,
+            EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_OVERALL_RATING
+    };
+
+    private static EspcItemDataSource mInstance = null;
+
+    public static EspcItemDataSource getInstance(Context ctx) {
+
+        // Use the application context, which will ensure that you
+        // don't accidentally leak an Activity's context.
+        // See this article for more information: http://bit.ly/6LRzfx
+        if (mInstance == null) {
+            mInstance = new EspcItemDataSource(ctx.getApplicationContext());
+        }
+        return mInstance;
+    }
 
     /**
      * Constructor of the class
@@ -70,16 +91,16 @@ public class EspcItemDataSource {
         ContentValues values = new ContentValues();
         //check of the item to be added in the db is paced correctly by the saxParser
 
-        values.put(EspcSQLiteHelper.COLUMN_ID, item.getId());
-        values.put(EspcSQLiteHelper.COLUMN_ADDRESS, item.getAddress());
-        values.put(EspcSQLiteHelper.COLUMN_PRICE, item.getPrice());
-        values.put(EspcSQLiteHelper.COLUMN_UUID, item.getUuid());
-        values.put(EspcSQLiteHelper.COLUMN_USER_ID, item.getUserID());
-        values.put(EspcSQLiteHelper.COLUMN_LAST_UPDATED, item.getLastUpdated());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_ID, item.getId());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_ADDRESS, item.getAddress());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_PRICE, item.getPrice());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_UUID, item.getUuid());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_USER_ID, item.getUserID());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_LAST_UPDATED, item.getLastUpdated());
 
         if (!ifExistsLocally(item)) {
             // insert the values and store the id returned by the operation
-            long insertId = mDatabase.insert(EspcSQLiteHelper.TABLE_NAME, null, values);
+            long insertId = mDatabase.insert(EspcSQLiteHelper.PROPERTY_TABLE_NAME, null, values);
             //log the inserting item for debugging purposes
             Log.d("MainActivity", "ADDING Property to db");
             Log.d(TAG, "=============================================");
@@ -95,23 +116,55 @@ public class EspcItemDataSource {
         return tempItem;
     }
 
+
+    public UserPropertyRating createUserPropertyRatingItem(UserPropertyRating upr) {
+        UserPropertyRating userPropertyRating = upr;
+        ContentValues values = new ContentValues();
+
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_ID, upr.getId());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_UUID, upr.getUuid());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_USER_ID, upr.getUserID());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_PROPERTY_ID, upr.getPropertyID());
+        values.put(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_OVERALL_RATING, upr.getOverallRating());
+
+        if (!ifExistsLocally(upr)) {
+            // insert the values and store the id returned by the operation
+            long insertId = mDatabase.insert(EspcSQLiteHelper.USER_PROPERTY_RATING_TABLE_NAME, null, values);
+            // log the inserting item for debugging purposes
+            Log.d("MainActivity", "ADDING UserPropertyRating to db");
+            Log.d(TAG, "=============================================");
+            Log.d(TAG, "id: " + upr.getId());
+            Log.d(TAG, "uuid: " + upr.getUuid());
+            Log.d(TAG, "userID: " + upr.getUserID());
+            Log.d(TAG, "propertyID: " + upr.getPropertyID());
+            Log.d(TAG, "overallRating: " + upr.getOverallRating());
+            Log.d(TAG, "=============================================");
+
+        } else {
+            Log.d(TAG, "UserPropertyRating Already Exists in the DB");
+        }
+
+        return userPropertyRating;
+    }
+
+
     /**
      * Method to edit a task in the database
      *
      * @param item object that contains the new data
      */
     public void updatePropertyItem(Property item) {
-        Log.d(TAG,"Updating property with id: " + item.getId());
+        Log.d(TAG, "Updating property with id: " + item.getId());
         long id = item.getId();
         ContentValues values = new ContentValues();
-        values.put(EspcSQLiteHelper.COLUMN_ID, item.getId());
-        values.put(EspcSQLiteHelper.COLUMN_UUID, item.getUuid());
-        values.put(EspcSQLiteHelper.COLUMN_ADDRESS, item.getAddress());
-        values.put(EspcSQLiteHelper.COLUMN_PRICE, item.getPrice());
-        values.put(EspcSQLiteHelper.COLUMN_USER_ID, item.getUserID());
-        values.put(EspcSQLiteHelper.COLUMN_LAST_UPDATED, item.getLastUpdated());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_ID, item.getId());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_UUID, item.getUuid());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_ADDRESS, item.getAddress());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_PRICE, item.getPrice());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_USER_ID, item.getUserID());
+        values.put(EspcSQLiteHelper.PROPERTY_COLUMN_LAST_UPDATED, item.getLastUpdated());
         mDatabase.update(
-                EspcSQLiteHelper.TABLE_NAME,
+                EspcSQLiteHelper.PROPERTY_TABLE_NAME,
                 values,
                 "id=?",
                 new String[]{"" + id}
@@ -119,12 +172,12 @@ public class EspcItemDataSource {
     }
 
     public Property getPropertyItemById(int id) {
-        Cursor cursor = mDatabase.query(EspcSQLiteHelper.TABLE_NAME, allColumns, EspcSQLiteHelper.COLUMN_ID + " =? ",
+        Cursor cursor = mDatabase.query(EspcSQLiteHelper.PROPERTY_TABLE_NAME, allPropertyColumns, EspcSQLiteHelper.PROPERTY_COLUMN_ID + " =? ",
                 new String[]{id + ""}, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
 
-        return generateObjectFromCursor(cursor);
+        return generatePropertyObjectFromCursor(cursor);
     }
 
     /***
@@ -143,33 +196,36 @@ public class EspcItemDataSource {
         return false;
     }
 
-//    public boolean ifExistsRemotely(Property localProperty, ArrayList<Property> remoteProperties) {
-//       return (remoteProperties.contains(localProperty));
-//    }
-//    public void retainAllLocalFromRemote(List<Property> remoteProperties) {
-//        ArrayList<Property> localProperties = getAllPropertyItems();
-//        Log.d(TAG, "Local db size: " + localProperties.size());
-//        Log.d(TAG, "Remote db size: " + remoteProperties.size());
-//
-//        for (int i = 0; i < localProperties.size(); i++) {
-//            if (remoteProperties.contains(localProperties.get(i))) {
-//                Log.d(TAG, "remote contains local property with id: " + localProperties.get(i).getId());
-//            } else {
-//                Log.d(TAG, "remote DO NOT contains local property with id: " + localProperties.get(i).getId() + " so DELETE IT");
-//                // delete it
-//                deletePropertyItem(localProperties.get(i));
-//            }
-//        }
-//    }
+    public boolean ifExistsLocally(UserPropertyRating upr) {
+        ArrayList<UserPropertyRating> userPropertyRatings = getAllUserPropertyRatingItems();
+        for (UserPropertyRating ur : userPropertyRatings) {
+            if (ur.getId() == upr.getId()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     /**
-     * Method that deletes an entry in the database
+     * Method that deletes a record by id in the Property table
      *
      * @param item the task to be deleted
      */
     public void deletePropertyItem(Property item) {
         long id = item.getId();
-        mDatabase.delete(EspcSQLiteHelper.TABLE_NAME, EspcSQLiteHelper.COLUMN_ID
+        mDatabase.delete(EspcSQLiteHelper.PROPERTY_TABLE_NAME, EspcSQLiteHelper.PROPERTY_COLUMN_ID
+                + " = " + id, null);
+    }
+
+    /***
+     * Method that deletes a record by id in the UserPropertyRating table
+     *
+     * @param userPropertyRating
+     */
+    public void deleteUserPropertyRatingItem(UserPropertyRating userPropertyRating) {
+        long id = userPropertyRating.getId();
+        mDatabase.delete(EspcSQLiteHelper.USER_PROPERTY_RATING_TABLE_NAME, EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_ID
                 + " = " + id, null);
     }
 
@@ -183,12 +239,12 @@ public class EspcItemDataSource {
         //temporary list of RssItems
         ArrayList<Property> rssItems = new ArrayList<>();
         //cursor object to store the result of the query
-        Cursor cursor = mDatabase.query(EspcSQLiteHelper.TABLE_NAME, allColumns, null,
+        Cursor cursor = mDatabase.query(EspcSQLiteHelper.PROPERTY_TABLE_NAME, allPropertyColumns, null,
                 null, null, null, null);
         //iterate through the cursor
         if (cursor != null && cursor.moveToFirst()) {
             while (!cursor.isAfterLast()) {
-                rssItems.add(generateObjectFromCursor(cursor));
+                rssItems.add(generatePropertyObjectFromCursor(cursor));
                 cursor.moveToNext();
             }
             //close the cursor object
@@ -198,12 +254,44 @@ public class EspcItemDataSource {
         return rssItems;
     }
 
+    public ArrayList<UserPropertyRating> getAllUserPropertyRatingItems() {
+        Log.d(TAG, "Getting all user property ratings from the database...");
+        //temporary list of RssItems
+        ArrayList<UserPropertyRating> userPropertyRatingsItems = new ArrayList<>();
+        //cursor object to store the result of the query
+        Cursor cursor = mDatabase.query(EspcSQLiteHelper.USER_PROPERTY_RATING_TABLE_NAME, allUserPropertyRatingColumns, null,
+                null, null, null, null);
+        //iterate through the cursor
+        if (cursor != null && cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                userPropertyRatingsItems.add(generateUPRObjectFromCursor(cursor));
+                cursor.moveToNext();
+            }
+            //close the cursor object
+            cursor.close();
+        }
+        //return the list of rssItems
+        return userPropertyRatingsItems;
+    }
+
+    public ArrayList<UserPropertyRating> getAllPropertyRatingsAssociatedWithPropertyId(int propertyId){
+        ArrayList<UserPropertyRating> userPropertyRatingsWithId = new ArrayList<>();
+
+        for(UserPropertyRating ups: getAllUserPropertyRatingItems()){
+            if(ups.getPropertyID() == propertyId){
+                userPropertyRatingsWithId.add(ups);
+            }
+        }
+
+        return userPropertyRatingsWithId;
+    }
+
 
     public ArrayList<Property> read(String selection, String[] selectionArgs, String groupBy, String having, String orderBy) {
         //temporary list of RssItems
         ArrayList<Property> items = new ArrayList<Property>();
         //cursor object to store the result of the query
-        Cursor cursor = mDatabase.query(EspcSQLiteHelper.TABLE_NAME, allColumns, selection, selectionArgs, groupBy, having, orderBy);
+        Cursor cursor = mDatabase.query(EspcSQLiteHelper.PROPERTY_TABLE_NAME, allPropertyColumns, selection, selectionArgs, groupBy, having, orderBy);
         //iterate through the cursor
         cursor.moveToFirst();
         while (!cursor.isAfterLast()) {
@@ -225,7 +313,7 @@ public class EspcItemDataSource {
      * Method that deletes/clears the database
      */
     public void deleteAll() {
-        mDatabase.delete(EspcSQLiteHelper.TABLE_NAME, null, null);
+        mDatabase.delete(EspcSQLiteHelper.PROPERTY_TABLE_NAME, null, null);
         Log.d(TAG, "Deleting all Property entries...");
     }
 
@@ -260,7 +348,7 @@ public class EspcItemDataSource {
      * @param cursor reference to the cursor
      * @return the RssItem object
      */
-    public Property generateObjectFromCursor(Cursor cursor) {
+    public Property generatePropertyObjectFromCursor(Cursor cursor) {
         //check if the cursor is null
         if (cursor == null) {
             //... return
@@ -269,13 +357,31 @@ public class EspcItemDataSource {
         //temporary RssItem object
         Property propertyItem = new Property();
         //set up the object using the cursor object...
-        propertyItem.setId(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_ID)));
-        propertyItem.setUuid(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_UUID)));
-        propertyItem.setUserID(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_USER_ID)));
-        propertyItem.setAddress(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_ADDRESS)));
-        propertyItem.setPrice(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_PRICE)));
-        propertyItem.setLastUpdated(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.COLUMN_LAST_UPDATED)));
+        propertyItem.setId(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_ID)));
+        propertyItem.setUuid(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_UUID)));
+        propertyItem.setUserID(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_USER_ID)));
+        propertyItem.setAddress(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_ADDRESS)));
+        propertyItem.setPrice(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_PRICE)));
+        propertyItem.setLastUpdated(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_LAST_UPDATED)));
         //return the object
         return propertyItem;
+    }
+
+    public UserPropertyRating generateUPRObjectFromCursor(Cursor cursor) {
+        //check if the cursor is null
+        if (cursor == null) {
+            //... return
+            return null;
+        }
+        //temporary UserPropertyRating object
+        UserPropertyRating upr = new UserPropertyRating();
+        //set up the object using the cursor object...
+        upr.setId(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_ID)));
+        upr.setUuid(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_UUID)));
+        upr.setUserID(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_USER_ID)));
+        upr.setPropertyID(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_PROPERTY_ID)));
+        upr.setOverallRating(cursor.getInt(cursor.getColumnIndex(EspcSQLiteHelper.USER_PROPERTY_RATING_COLUMN_OVERALL_RATING)));
+        //return the object
+        return upr;
     }
 }

@@ -9,33 +9,59 @@ import android.util.Log;
  * Created by georgi on 17/06/16.
  */
 public class EspcSQLiteHelper extends SQLiteOpenHelper {
+
+    //==============================Property==========================
     //name of the table
-    public static final String TABLE_NAME = "Property";
+    public static final String PROPERTY_TABLE_NAME = "Property";
     //name of the column id
-    public static final String COLUMN_ID = "id";
+    public static final String PROPERTY_COLUMN_ID = "id";
     //name of the column description
-    public static final String COLUMN_PRICE = "price";
+    public static final String PROPERTY_COLUMN_PRICE = "price";
     //name of the column title
-    public static final String COLUMN_ADDRESS = "address";
+    public static final String PROPERTY_COLUMN_ADDRESS = "address";
     //name of the column publication date
-    public static final String COLUMN_USER_ID = "userID";
+    public static final String PROPERTY_COLUMN_USER_ID = "userID";
     // name of the column uuid
-    public static final String COLUMN_UUID = "uuid";
+    public static final String PROPERTY_COLUMN_UUID = "uuid";
     //file name of the database
-    public static final String COLUMN_LAST_UPDATED = "lastUpdated";
+    public static final String PROPERTY_COLUMN_LAST_UPDATED = "lastUpdated";
+
+
+    //==============================UserPropertyRating===================
+    //name of the table
+    public static final String USER_PROPERTY_RATING_TABLE_NAME = "UserPropertyRating";
+    //name of the column id
+    public static final String USER_PROPERTY_RATING_COLUMN_ID = "id";
+    // name of the column uuid
+    public static final String USER_PROPERTY_RATING_COLUMN_UUID = "uuid";
+    //name of the column publication date
+    public static final String USER_PROPERTY_RATING_COLUMN_USER_ID = "userID";
+    //name of the column description
+    public static final String USER_PROPERTY_RATING_COLUMN_PROPERTY_ID = "propertyID";
+    //name of the column title
+    public static final String USER_PROPERTY_RATING_COLUMN_OVERALL_RATING = "overallRating";
+
+
     private static final String DATABASE_NAME = "espc.db";
     //version number of the database
     private static final int DATABASE_VERSION = 1;
 
-    // Database creation sql statement
-    private static final String DATABASE_CREATE = "create table "
-            + TABLE_NAME + "( " + COLUMN_ID + " integer primary key autoincrement, "
-            + COLUMN_UUID + " text, "
-            + COLUMN_PRICE + " text, "
-            + COLUMN_ADDRESS + " text, "
-            + COLUMN_USER_ID + " integer, "
-            + COLUMN_LAST_UPDATED + " text " + ");";
+    // Property table creation sql statement
+    private static final String PROPERTY_CREATE = "create table "
+            + PROPERTY_TABLE_NAME + "( " + PROPERTY_COLUMN_ID + " integer primary key autoincrement, "
+            + PROPERTY_COLUMN_UUID + " text, "
+            + PROPERTY_COLUMN_PRICE + " text, "
+            + PROPERTY_COLUMN_ADDRESS + " text, "
+            + PROPERTY_COLUMN_USER_ID + " integer, "
+            + PROPERTY_COLUMN_LAST_UPDATED + " text " + ");";
 
+    // Property table creation sql statement
+    private static final String USER_PROPERTY_RATING_CREATE = "create table "
+            + USER_PROPERTY_RATING_TABLE_NAME + "( " + USER_PROPERTY_RATING_COLUMN_ID + " integer primary key autoincrement, "
+            + USER_PROPERTY_RATING_COLUMN_UUID + " text, "
+            + USER_PROPERTY_RATING_COLUMN_USER_ID + " integer, "
+            + USER_PROPERTY_RATING_COLUMN_PROPERTY_ID + " integer, "
+            + USER_PROPERTY_RATING_COLUMN_OVERALL_RATING + " integer " + ");";
 
 
 
@@ -45,7 +71,10 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase database) {
-        database.execSQL(DATABASE_CREATE);
+        // create Property table...
+        database.execSQL(PROPERTY_CREATE);
+        // create UserPropertyRating table...
+        database.execSQL(USER_PROPERTY_RATING_CREATE);
     }
 
     @Override
@@ -53,7 +82,8 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
         Log.w(EspcSQLiteHelper.class.getName(),
                 "Upgrading database from version " + oldVersion + " to "
                         + newVersion + ", which will destroy all old data");
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + PROPERTY_TABLE_NAME);
+        db.execSQL("DROP TABLE IF EXISTS " + USER_PROPERTY_RATING_TABLE_NAME);
         onCreate(db);
     }
 }

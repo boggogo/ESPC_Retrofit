@@ -5,9 +5,13 @@ import java.io.Serializable;
 /**
  * Created by georgi on 15/06/16.
  */
-public class UserPropertyRating implements Serializable{
+public class UserPropertyRating implements Serializable {
     private int id;
     private String uuid;
+    private int userID;
+    private int propertyID;
+    private int overallRating;
+
     public int getId() {
         return id;
     }
@@ -15,11 +19,6 @@ public class UserPropertyRating implements Serializable{
     public void setId(int id) {
         this.id = id;
     }
-
-    private int userID;
-    private int propertyID;
-    private int overallRating;
-
 
     public String getUuid() {
         return uuid;

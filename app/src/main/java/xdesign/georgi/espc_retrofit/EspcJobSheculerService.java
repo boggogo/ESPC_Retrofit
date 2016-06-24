@@ -22,6 +22,7 @@ import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.Backend.Sync;
+import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -44,6 +45,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
     private Call<List<Property>> getPropByUUIDCall;
+    private Call<List<UserPropertyRating>> getUsPropRtByUUIDCall;
 
     @Override
     public void onCreate() {
@@ -51,7 +53,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
         espcService = ESPCService.retrofit.create(ESPCService.class);
         syncQueue = new LinkedList<Sync>();
 
-        mPropertyItemDataSource = new EspcItemDataSource(getApplicationContext());
+        mPropertyItemDataSource = EspcItemDataSource.getInstance(getApplicationContext());
         mPropertyItemDataSource.open();
 
         mPreferences = PreferenceManager.getDefaultSharedPreferences(this);
@@ -60,7 +62,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
     @Override
     public boolean onStartJob(JobParameters params) {
-        if(params.getJobId() == 1) {
+        if (params.getJobId() == 1) {
             mJobHandler.sendMessage(Message.obtain(mJobHandler, 1, params));
             return true;
         }
@@ -183,7 +185,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                         break;
 
                     case ACTION_UPDATE:
-                        Log.d(TAG,"action - update");
+                        Log.d(TAG, "action - update");
                         // get the record from Property table with this uuid...
                         getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
                         getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
@@ -211,11 +213,46 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
             }
 
-            if(c.getTable().equals(TABLE_USER_PROPERTY_RATING)){
+            if (c.getTable().equals(TABLE_USER_PROPERTY_RATING)) {
                 Log.d(TAG, "Table: TABLE_USER_PROPERTY_RATING");
-                //// TODO: 23/06/16  implement sync for UserPropertyRating table as well
-            }
 
+
+                switch (c.getAction()) {
+                    case ACTION_CREATE:
+                        Log.d(TAG, "ACTION_CREATE");
+                        getUsPropRtByUUIDCall = espcService.getUserPropertyRatingByUUID(c.getUuid());
+                        getUsPropRtByUUIDCall.enqueue(new Callback<List<UserPropertyRating>>() {
+                            @Override
+                            public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
+                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting user property rating by uuid");
+                                if(response.isSuccessful()){
+                                    for(UserPropertyRating upr:response.body()){
+                                        mPropertyItemDataSource.createUserPropertyRatingItem(upr);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
+                                Log.e(TAG, "onFailure getting user property rating by uuid");
+                            }
+                        });
+                        break;
+
+                    case ACTION_DELETE:
+                        Log.d(TAG, "ACTION_DELETE");
+                        ArrayList<UserPropertyRating> userPropertyRatings = mPropertyItemDataSource.getAllUserPropertyRatingItems();
+                        for(UserPropertyRating ur: userPropertyRatings){
+                            if(ur.getUuid().equals(c.getUuid())){
+                                mPropertyItemDataSource.deleteUserPropertyRatingItem(ur);
+                                Log.d(TAG,"Deleting UserPropertyRating: " + ur.toString());
+                            }
+                        }
+                        break;
+
+                }
+
+            }
 
             mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getTimeChanged()).apply();
         }
