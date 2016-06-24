@@ -20,12 +20,14 @@ import android.widget.Toast;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.UserPropertyRatingsAdapter;
 import xdesign.georgi.espc_retrofit.Backend.ESPCService;
+import xdesign.georgi.espc_retrofit.Backend.Sync;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
 import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
@@ -240,9 +242,14 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
     public void onPositiveUpdatePropRating(int selectedValue, final int propertyToBeUpdatedIndex) {
         Log.d(TAG,"Selected Value: " + selectedValue + " " + "id of property rating to be updated: " + mPropertyRatings.get(propertyToBeUpdatedIndex).getId());
         UserPropertyRating oldRating = mPropertyRatings.get(propertyToBeUpdatedIndex);
+
+        final String uuid = UUID.randomUUID().toString();
+        final long unixTimestamp = System.currentTimeMillis();
+
         // Set up new poroperty rating
         final UserPropertyRating newRating = new UserPropertyRating();
         newRating.setPropertyID(oldRating.getPropertyID());
+        newRating.setUuid(uuid);
         newRating.setUserID(oldRating.getUserID());
         newRating.setOverallRating(selectedValue);
         newRating.setId(oldRating.getId());
@@ -254,8 +261,8 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
                 Log.d(TAG,"onResponse add new :" + response.isSuccessful());
                 // Show the user the status of the post request...
                 if(response.isSuccessful() | response.body() != null){
-                    mPropertyRatings.set(propertyToBeUpdatedIndex,newRating);
-                    showToast("Success!");
+                    addSyncToRemote(propertyToBeUpdatedIndex, uuid, unixTimestamp, newRating);
+
                 }else{
                     showToast("Failed!" + response.errorBody());
                 }
@@ -266,6 +273,34 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
             @Override
             public void onFailure(Call<UserPropertyRating> call, Throwable t) {
                 Log.e(TAG, "Update new user property ratings error: " + t.toString());
+            }
+        });
+
+
+
+    }
+
+    private void addSyncToRemote(final int propertyToBeUpdatedIndex, String uuid, long unixTimestamp, final UserPropertyRating newRating) {
+        Sync sync = new Sync();
+        sync.setUuid(uuid);
+        sync.setAction("update");
+        sync.setTable("UserPropertyRating");
+        sync.setTimeChanged(unixTimestamp);
+
+        espcService.addNewSync(sync).enqueue(new Callback<Sync>() {
+            @Override
+            public void onResponse(Call<Sync> call, Response<Sync> response) {
+                Log.d(TAG,"onResponse add new :" + response.isSuccessful());
+                if(response.isSuccessful() && response.body() != null){
+                    mPropertyRatings.set(propertyToBeUpdatedIndex,newRating);
+                    mEpcItemDataSource.updateUserPropertyRatingItem(newRating);
+                    showToast("Success!");
+                }
+            }
+
+            @Override
+            public void onFailure(Call<Sync> call, Throwable t) {
+                Log.e(TAG, "onFailure error: " + t.toString());
             }
         });
     }

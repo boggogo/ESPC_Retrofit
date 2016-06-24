@@ -107,6 +107,10 @@ public interface ESPCService {
     @GET("Syncs/getRecodsAfterTimestamp")
     Call<List<Sync>> getAllSyncsAfterThisTimeStamp(@Query(("timeChanged")) long timeChanged);
 
+    // Add new sync record
+    @POST("Syncs")
+    Call<Sync> addNewSync(@Body Sync s);
+
 
 
 
