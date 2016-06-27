@@ -108,11 +108,6 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
         if (response.isSuccessful()) {
 
-//            if(response.body().size() == 0){
-//                Log.e(TAG,"REMOTE SYNC TABLE SIZE IS 0 - resetting the local sync time to 0");
-//                mEditor.putLong(Constants.LAST_SYNC_TIME_KEY,0L).apply();
-//            }
-
             for (Sync c : response.body()) {
                 syncQueue.add(c);
                 Log.d(TAG, c.toString());
@@ -127,163 +122,193 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
         while (syncIterator.hasNext()) {
 //            Log.d(TAG,syncIterator.next().toString());
             Sync c = syncIterator.next();
-
+            // get the uuid of the current Sync item
             String uuid = c.getUuid();
-
-            Log.d(TAG, c.toString());
-            // Check which table that the change occur in...
-            if (c.getTable().equals(TABLE_PROPERTY)) {
-                Log.d(TAG, "Table: Property");
+            // check if there is a DELETE action after CREATE action for this uuid...
+            if (doesContainDeleteAfterCreateAction(uuid, syncQueue.iterator())) {
+                Log.e(TAG, "No need to create this Action. There is a delete action statement with this uuid in the queue");
+            } else {
+                Log.e(TAG, "Need to create this Action. There is a NO delete action statement with this uuid in the queue");
+                // Check which table that the change occur in
+                if (c.getTable().equals(TABLE_PROPERTY)) {
+                    Log.d(TAG, "Table: Property");
 // check what action to do in the local database...
-                switch (c.getAction()) {
-                    case ACTION_CREATE:
-                        Log.d(TAG, "action - create");
-                        // create a new record in the local database but first we have to cherry pick the record from the remote api
+                    switch (c.getAction()) {
+                        case ACTION_CREATE:
+                            Log.d(TAG, "action - create");
+                            // create a new record in the local database but first we have to cherry pick the record from the remote api
 
 
-                        // get the record from Property table with this uuid...
-                        getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
+                            // get the record from Property table with this uuid...
+                            getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
 
-                        getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
-                            @Override
-                            public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
-                                if (response.isSuccessful()) {
-                                    for (Property p : response.body()) {
-                                        Log.d(TAG, p.toString());
-                                        // create new property locally as well.
-                                        mPropertyItemDataSource.createPropertyItem(p);
-                                        // refresh the screen with the latest data from the local db...
-                                        MainActivity.getDataFromTheLocalDB();
+                            getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
+                                @Override
+                                public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
+                                    Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
+                                    if (response.isSuccessful()) {
+                                        for (Property p : response.body()) {
+                                            Log.d(TAG, p.toString());
+                                            // create new property locally as well.
+                                            mPropertyItemDataSource.createPropertyItem(p);
+                                            // refresh the screen with the latest data from the local db...
+                                            MainActivity.getDataFromTheLocalDB();
+                                        }
                                     }
+                                }
+
+                                @Override
+                                public void onFailure(Call<List<Property>> call, Throwable t) {
+                                    Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
+                                }
+                            });
+                            break;
+
+                        case ACTION_DELETE:
+                            Log.d(TAG, "action - delete");
+                            // loop through the local db and find the property with the uuid that needs to be deleted
+
+                            ArrayList<Property> localProperties = mPropertyItemDataSource.getAllPropertyItems();
+
+                            for (Property p : localProperties) {
+                                if (p.getUuid().equals(uuid)) {
+                                    // delete it
+                                    Log.d(TAG, "Deleting property: " + p.toString());
+                                    mPropertyItemDataSource.deletePropertyItem(p);
+                                    // refresh the screen with the latest data from the local db...
+                                    MainActivity.getDataFromTheLocalDB();
                                 }
                             }
 
-                            @Override
-                            public void onFailure(Call<List<Property>> call, Throwable t) {
-                                Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
-                            }
-                        });
-                        break;
+                            break;
 
-                    case ACTION_DELETE:
-                        Log.d(TAG, "action - delete");
-                        // loop through the local db and find the property with the uuid that needs to be deleted
+                        case ACTION_UPDATE:
+                            Log.d(TAG, "action - update");
+                            // get the record from Property table with this uuid...
+                            getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
+                            getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
+                                @Override
+                                public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
+                                    Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
+                                    if (response.isSuccessful()) {
+                                        for (Property p : response.body()) {
+                                            Log.d(TAG, p.toString());
+                                            // create new property locally as well.
+                                            mPropertyItemDataSource.updatePropertyItem(p);
+                                            // refresh the screen with the latest data from the local db...
+                                            MainActivity.getDataFromTheLocalDB();
+                                        }
+                                    }
+                                }
 
-                        ArrayList<Property> localProperties = mPropertyItemDataSource.getAllPropertyItems();
+                                @Override
+                                public void onFailure(Call<List<Property>> call, Throwable t) {
+                                    Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
+                                }
+                            });
+                            break;
 
-                        for (Property p : localProperties) {
-                            if (p.getUuid().equals(uuid)) {
-                                // delete it
-                                Log.d(TAG, "Deleting property: " + p.toString());
-                                mPropertyItemDataSource.deletePropertyItem(p);
-                                // refresh the screen with the latest data from the local db...
-                                MainActivity.getDataFromTheLocalDB();
-                            }
+                    }
+                    if (c.getTable().equals(TABLE_USER_PROPERTY_RATING)) {
+                        Log.d(TAG, "Table: TABLE_USER_PROPERTY_RATING");
+
+
+                        switch (c.getAction()) {
+                            case ACTION_CREATE:
+                                Log.d(TAG, "ACTION_CREATE");
+                                getUsPropRtByUUIDCall = espcService.getUserPropertyRatingByUUID(c.getUuid());
+                                getUsPropRtByUUIDCall.enqueue(new Callback<List<UserPropertyRating>>() {
+                                    @Override
+                                    public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
+                                        Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting user property rating by uuid");
+                                        if (response.isSuccessful()) {
+                                            for (UserPropertyRating upr : response.body()) {
+                                                mPropertyItemDataSource.createUserPropertyRatingItem(upr);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
+                                        Log.e(TAG, "onFailure getting user property rating by uuid");
+                                    }
+                                });
+                                break;
+
+                            case ACTION_UPDATE:
+                                Log.d(TAG, "ACTION_UPDATE");
+                                getUsPropRtByUUIDCall = espcService.getUserPropertyRatingByUUID(c.getUuid());
+                                getUsPropRtByUUIDCall.enqueue(new Callback<List<UserPropertyRating>>() {
+                                    @Override
+                                    public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
+                                        Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting user property rating by uuid");
+                                        if (response.isSuccessful()) {
+                                            for (UserPropertyRating upr : response.body()) {
+                                                mPropertyItemDataSource.updateUserPropertyRatingItem(upr);
+                                            }
+                                        }
+                                    }
+
+                                    @Override
+                                    public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
+                                        Log.e(TAG, "onFailure getting user property rating by uuid");
+                                    }
+                                });
+                                break;
+
+                            case ACTION_DELETE:
+                                Log.d(TAG, "ACTION_DELETE");
+                                ArrayList<UserPropertyRating> userPropertyRatings = mPropertyItemDataSource.getAllUserPropertyRatingItems();
+                                for (UserPropertyRating ur : userPropertyRatings) {
+                                    if (ur.getUuid().equals(c.getUuid())) {
+                                        mPropertyItemDataSource.deleteUserPropertyRatingItem(ur);
+                                        Log.d(TAG, "Deleting UserPropertyRating: " + ur.toString());
+                                    }
+                                }
+                                break;
+
                         }
 
-                        break;
-
-                    case ACTION_UPDATE:
-                        Log.d(TAG, "action - update");
-                        // get the record from Property table with this uuid...
-                        getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
-                        getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
-                            @Override
-                            public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
-                                if (response.isSuccessful()) {
-                                    for (Property p : response.body()) {
-                                        Log.d(TAG, p.toString());
-                                        // create new property locally as well.
-                                        mPropertyItemDataSource.updatePropertyItem(p);
-                                        // refresh the screen with the latest data from the local db...
-                                        MainActivity.getDataFromTheLocalDB();
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<List<Property>> call, Throwable t) {
-                                Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
-                            }
-                        });
-                        break;
-                }
-
-            }
-
-            if (c.getTable().equals(TABLE_USER_PROPERTY_RATING)) {
-                Log.d(TAG, "Table: TABLE_USER_PROPERTY_RATING");
 
 
-                switch (c.getAction()) {
-                    case ACTION_CREATE:
-                        Log.d(TAG, "ACTION_CREATE");
-                        getUsPropRtByUUIDCall = espcService.getUserPropertyRatingByUUID(c.getUuid());
-                        getUsPropRtByUUIDCall.enqueue(new Callback<List<UserPropertyRating>>() {
-                            @Override
-                            public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
-                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting user property rating by uuid");
-                                if(response.isSuccessful()){
-                                    for(UserPropertyRating upr:response.body()){
-                                        mPropertyItemDataSource.createUserPropertyRatingItem(upr);
-                                    }
-                                }
-                            }
+                    }
+//        Log.d(TAG,syncQueue.peek().toString());
 
-                            @Override
-                            public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
-                                Log.e(TAG, "onFailure getting user property rating by uuid");
-                            }
-                        });
-                        break;
-
-                    case ACTION_UPDATE:
-                        Log.d(TAG,"ACTION_UPDATE");
-                        getUsPropRtByUUIDCall = espcService.getUserPropertyRatingByUUID(c.getUuid());
-                        getUsPropRtByUUIDCall.enqueue(new Callback<List<UserPropertyRating>>() {
-                            @Override
-                            public void onResponse(Call<List<UserPropertyRating>> call, Response<List<UserPropertyRating>> response) {
-                                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting user property rating by uuid");
-                                if(response.isSuccessful()){
-                                    for(UserPropertyRating upr:response.body()){
-                                        mPropertyItemDataSource.updateUserPropertyRatingItem(upr);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Call<List<UserPropertyRating>> call, Throwable t) {
-                                Log.e(TAG, "onFailure getting user property rating by uuid");
-                            }
-                        });
-                        break;
-
-                    case ACTION_DELETE:
-                        Log.d(TAG, "ACTION_DELETE");
-                        ArrayList<UserPropertyRating> userPropertyRatings = mPropertyItemDataSource.getAllUserPropertyRatingItems();
-                        for(UserPropertyRating ur: userPropertyRatings){
-                            if(ur.getUuid().equals(c.getUuid())){
-                                mPropertyItemDataSource.deleteUserPropertyRatingItem(ur);
-                                Log.d(TAG,"Deleting UserPropertyRating: " + ur.toString());
-                            }
-                        }
-                        break;
 
                 }
-
             }
 
             mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getTimeChanged()).apply();
         }
-//        Log.d(TAG,syncQueue.peek().toString());
-
-
     }
+
 
     @Override
     public void onFailure(Call<List<Sync>> call, Throwable t) {
         Log.e(TAG, "onFailure error" + t.toString());
+    }
+
+
+    private boolean doesContainDeleteAfterCreateAction(String currentSyncUuid, Iterator<Sync> iterator) {
+        int count = 0;
+        boolean hasDeleteAfterCreate;
+        while (iterator.hasNext()) {
+            Sync c = iterator.next();
+            if (c.getAction().equals(ACTION_CREATE) && currentSyncUuid.equals(c.getUuid())) {
+                count++;
+            }
+
+            if (c.getAction().equals(ACTION_DELETE) && currentSyncUuid.equals(c.getUuid())) {
+                count *= -1;
+            }
+        }
+
+        if (count == -1) {
+            hasDeleteAfterCreate = true;
+        } else {
+            hasDeleteAfterCreate = false;
+        }
+
+        return hasDeleteAfterCreate;
     }
 }
