@@ -10,6 +10,9 @@ import android.util.Log;
  */
 public class EspcSQLiteHelper extends SQLiteOpenHelper {
 
+    private static final String DATABASE_NAME = "espc.db";
+    //version number of the database
+    private static final int DATABASE_VERSION = 1;
     //==============================Property==========================
     //name of the table
     public static final String PROPERTY_TABLE_NAME = "Property";
@@ -27,6 +30,17 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
     public static final String PROPERTY_COLUMN_LAST_UPDATED = "lastUpdated";
 
 
+
+    // Property table creation sql statement
+    private static final String PROPERTY_CREATE = "create table "
+            + PROPERTY_TABLE_NAME + "( " + PROPERTY_COLUMN_ID + " integer primary key autoincrement, "
+            + PROPERTY_COLUMN_UUID + " text, "
+            + PROPERTY_COLUMN_PRICE + " text, "
+            + PROPERTY_COLUMN_ADDRESS + " text, "
+            + PROPERTY_COLUMN_USER_ID + " integer, "
+            + PROPERTY_COLUMN_LAST_UPDATED + " text " + ");";
+
+
     //==============================UserPropertyRating===================
     //name of the table
     public static final String USER_PROPERTY_RATING_TABLE_NAME = "UserPropertyRating";
@@ -40,20 +54,6 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
     public static final String USER_PROPERTY_RATING_COLUMN_PROPERTY_ID = "propertyID";
     //name of the column title
     public static final String USER_PROPERTY_RATING_COLUMN_OVERALL_RATING = "overallRating";
-
-
-    private static final String DATABASE_NAME = "espc.db";
-    //version number of the database
-    private static final int DATABASE_VERSION = 1;
-
-    // Property table creation sql statement
-    private static final String PROPERTY_CREATE = "create table "
-            + PROPERTY_TABLE_NAME + "( " + PROPERTY_COLUMN_ID + " integer primary key autoincrement, "
-            + PROPERTY_COLUMN_UUID + " text, "
-            + PROPERTY_COLUMN_PRICE + " text, "
-            + PROPERTY_COLUMN_ADDRESS + " text, "
-            + PROPERTY_COLUMN_USER_ID + " integer, "
-            + PROPERTY_COLUMN_LAST_UPDATED + " text " + ");";
 
     // Property table creation sql statement
     private static final String USER_PROPERTY_RATING_CREATE = "create table "
@@ -86,4 +86,8 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + USER_PROPERTY_RATING_TABLE_NAME);
         onCreate(db);
     }
+
+
+
+
 }
