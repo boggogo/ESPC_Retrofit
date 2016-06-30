@@ -190,8 +190,10 @@ public class EspcItemDataSource {
     }
 
     public Property getPropertyItemById(int id) {
-        Cursor cursor = mDatabase.query(EspcSQLiteHelper.PROPERTY_TABLE_NAME, allPropertyColumns, EspcSQLiteHelper.PROPERTY_COLUMN_ID + " =? ",
-                new String[]{id + ""}, null, null, null, null);
+//        Cursor cursor = mDatabase.query(EspcSQLiteHelper.PROPERTY_TABLE_NAME, allPropertyColumns, EspcSQLiteHelper.PROPERTY_COLUMN_ID + " =? ",
+//                new String[]{id + ""}, null, null, null, null);
+        String q = "SELECT * FROM "+EspcSQLiteHelper.PROPERTY_TABLE_NAME+" WHERE _id = " + id  ;
+        Cursor cursor = mDatabase.rawQuery(q, null);
         if (cursor != null)
             cursor.moveToFirst();
 
@@ -402,4 +404,5 @@ public class EspcItemDataSource {
         //return the object
         return upr;
     }
+
 }
