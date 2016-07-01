@@ -166,8 +166,6 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                     }
 
             }
-//        Log.d(TAG,syncQueue.peek().toString());
-
 
             mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getTimeChanged()).apply();
         }
