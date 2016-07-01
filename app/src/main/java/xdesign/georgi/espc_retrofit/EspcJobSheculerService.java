@@ -111,70 +111,62 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
             }
         }
         Iterator<Sync> syncIterator = syncQueue.iterator();
-        Log.d(TAG, "Iterating over linked list===============================");
+        Log.d(TAG, "Iterating over linked list=============================== Size: " + response.body().size());
 
         while (syncIterator.hasNext()) {
 
             Sync c = syncIterator.next();
             // get the uuid of the current Sync item
             String uuid = c.getUuid();
-            // check if there is a DELETE action after CREATE action for this uuid...
-            if (doesContainDeleteAfterCreateAction(uuid, syncQueue.iterator())) {
-                Log.e(TAG, "No need to create this Action. There is a delete action statement with this uuid in the queue");
-            } else {
-                Log.e(TAG, "Need to create this Action. There is a NO delete action statement with this uuid in the queue");
-                // Check which table that the change occur in
-                switch (c.getTable()) {
-                    case TABLE_PROPERTY:
-                        Log.d(TAG, "Table: Property");
+            // Check which table that the change occur in
+            switch (c.getTable()) {
+                case TABLE_PROPERTY:
+                    Log.d(TAG, "Table: Property");
 // check what action to do in the local database...
-                        switch (c.getAction()) {
-                            case ACTION_CREATE:
-                                Log.d(TAG, "action - create");
-                                // create a new record in the local database but first we have to cherry pick the record from the remote api
-                                // get the record from Property table with this uuid...
-                                createOrUpdateLocally(uuid, ACTION_CREATE,TABLE_PROPERTY);
-                                Call<List<Property>> getPropByUUIDCall;
-                                break;
+                    switch (c.getAction()) {
+                        case ACTION_CREATE:
+                            Log.d(TAG, "action - create");
+                            // create a new record in the local database but first we have to cherry pick the record from the remote api
+                            // get the record from Property table with this uuid...
+                            createOrUpdateLocally(uuid, ACTION_CREATE, TABLE_PROPERTY);
+                            Call<List<Property>> getPropByUUIDCall;
+                            break;
 
-                            case ACTION_DELETE:
-                                Log.d(TAG, "action - delete");
-                                // loop through the local db and find the property with the uuid that needs to be deleted
-                                deleteRecordLocally(uuid, TABLE_PROPERTY);
-                                break;
+                        case ACTION_DELETE:
+                            Log.d(TAG, "action - delete");
+                            // loop through the local db and find the property with the uuid that needs to be deleted
+                            deleteRecordLocally(uuid, TABLE_PROPERTY);
+                            break;
 
-                            case ACTION_UPDATE:
-                                Log.d(TAG, "action - update");
-                                // get the record from Property table with this uuid...
-                                createOrUpdateLocally(uuid, ACTION_UPDATE, TABLE_PROPERTY);
-                                break;
-                        }
-                        break;
+                        case ACTION_UPDATE:
+                            Log.d(TAG, "action - update");
+                            // get the record from Property table with this uuid...
+                            createOrUpdateLocally(uuid, ACTION_UPDATE, TABLE_PROPERTY);
+                            break;
+                    }
+                    break;
 
-                    case TABLE_USER_PROPERTY_RATING:
-                        Log.d(TAG, "Table: TABLE_USER_PROPERTY_RATING");
-                        switch (c.getAction()) {
-                            case ACTION_CREATE:
-                                createOrUpdateLocally(uuid, ACTION_CREATE, TABLE_USER_PROPERTY_RATING);
-                                break;
+                case TABLE_USER_PROPERTY_RATING:
+                    Log.d(TAG, "Table: TABLE_USER_PROPERTY_RATING");
+                    switch (c.getAction()) {
+                        case ACTION_CREATE:
+                            createOrUpdateLocally(uuid, ACTION_CREATE, TABLE_USER_PROPERTY_RATING);
+                            break;
 
-                            case ACTION_UPDATE:
-                                Log.d(TAG, "ACTION_UPDATE");
-                                createOrUpdateLocally(uuid,ACTION_UPDATE, TABLE_USER_PROPERTY_RATING);
-                                break;
+                        case ACTION_UPDATE:
+                            Log.d(TAG, "ACTION_UPDATE");
+                            createOrUpdateLocally(uuid, ACTION_UPDATE, TABLE_USER_PROPERTY_RATING);
+                            break;
 
-                            case ACTION_DELETE:
-                                Log.d(TAG, "ACTION_DELETE");
-                                deleteRecordLocally(uuid,TABLE_USER_PROPERTY_RATING);
-                                break;
+                        case ACTION_DELETE:
+                            Log.d(TAG, "ACTION_DELETE");
+                            deleteRecordLocally(uuid, TABLE_USER_PROPERTY_RATING);
+                            break;
 
-                        }
-
-                }
-//        Log.d(TAG,syncQueue.peek().toString());
-
+                    }
 
             }
+//        Log.d(TAG,syncQueue.peek().toString());
 
 
             mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getTimeChanged()).apply();
@@ -210,33 +202,33 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
     private void createOrUpdateLocally(String uuid, final String action, String table) {
         switch (table) {
             case TABLE_PROPERTY:
-            Call<List<Property>> getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
-            getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
-                @Override
-                public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-                    Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
-                    if (response.isSuccessful()) {
-                        for (Property p : response.body()) {
-                            Log.d(TAG, p.toString());
-                            if (action.equals(ACTION_CREATE)) {
-                                // create new property locally as well.
-                                mPropertyItemDataSource.createPropertyItem(p);
+                Call<List<Property>> getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
+                getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
+                    @Override
+                    public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
+                        Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
+                        if (response.isSuccessful()) {
+                            for (Property p : response.body()) {
+                                Log.d(TAG, p.toString());
+                                if (action.equals(ACTION_CREATE)) {
+                                    // create new property locally as well.
+                                    mPropertyItemDataSource.createPropertyItem(p);
+                                }
+                                if (action.equals(ACTION_UPDATE)) {
+                                    // update local property
+                                    mPropertyItemDataSource.updatePropertyItem(p);
+                                }
+                                // refresh the screen with the latest data from the local db...
+                                MainActivity.getDataFromTheLocalDB();
                             }
-                            if (action.equals(ACTION_UPDATE)) {
-                                // update local property
-                                mPropertyItemDataSource.updatePropertyItem(p);
-                            }
-                            // refresh the screen with the latest data from the local db...
-                            MainActivity.getDataFromTheLocalDB();
                         }
                     }
-                }
 
-                @Override
-                public void onFailure(Call<List<Property>> call, Throwable t) {
-                    Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
-                }
-            });
+                    @Override
+                    public void onFailure(Call<List<Property>> call, Throwable t) {
+                        Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
+                    }
+                });
                 break;
             case TABLE_USER_PROPERTY_RATING:
                 getUsPropRtByUUIDCall = espcService.getUserPropertyRatingByUUID(uuid);
@@ -246,10 +238,10 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                         Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting user property rating by uuid");
                         if (response.isSuccessful()) {
                             for (UserPropertyRating upr : response.body()) {
-                                if(action.equals(ACTION_CREATE)) {
+                                if (action.equals(ACTION_CREATE)) {
                                     mPropertyItemDataSource.createUserPropertyRatingItem(upr);
                                 }
-                                if(action.equals(ACTION_UPDATE)){
+                                if (action.equals(ACTION_UPDATE)) {
                                     mPropertyItemDataSource.updateUserPropertyRatingItem(upr);
                                 }
                             }
@@ -264,34 +256,8 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                 break;
         }
     }
-
-
     @Override
     public void onFailure(Call<List<Sync>> call, Throwable t) {
         Log.e(TAG, "onFailure error" + t.toString());
-    }
-
-
-    private boolean doesContainDeleteAfterCreateAction(String currentSyncUuid, Iterator<Sync> iterator) {
-        int count = 0;
-        boolean hasDeleteAfterCreate;
-        while (iterator.hasNext()) {
-            Sync c = iterator.next();
-            if (c.getAction().equals(ACTION_CREATE) && currentSyncUuid.equals(c.getUuid())) {
-                count++;
-            }
-
-            if (c.getAction().equals(ACTION_DELETE) && currentSyncUuid.equals(c.getUuid())) {
-                count *= -1;
-            }
-        }
-
-        if (count == -1) {
-            hasDeleteAfterCreate = true;
-        } else {
-            hasDeleteAfterCreate = false;
-        }
-
-        return hasDeleteAfterCreate;
     }
 }
