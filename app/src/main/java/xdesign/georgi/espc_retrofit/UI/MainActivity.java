@@ -141,9 +141,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "List size: " + mProperties.size());
 
         mAdapter.notifyDataSetChanged();
-//        if(mPropertyItemDataSource != null){
-//            mPropertyItemDataSource.open();
-//        }
+        if(mPropertyItemDataSource != null){
+            mPropertyItemDataSource.open();
+        }
     }
 
     @TargetApi(Build.VERSION_CODES.LOLLIPOP)
