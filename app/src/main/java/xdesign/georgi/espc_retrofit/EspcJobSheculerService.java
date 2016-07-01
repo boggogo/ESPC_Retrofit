@@ -44,7 +44,6 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
     private final String TABLE_USER_PROPERTY_RATING = "UserPropertyRating";
     private SharedPreferences mPreferences;
     private SharedPreferences.Editor mEditor;
-    private Call<List<Property>> getPropByUUIDCall;
     private Call<List<UserPropertyRating>> getUsPropRtByUUIDCall;
 
     @Override
@@ -105,22 +104,17 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
     @Override
     public void onResponse(Call<List<Sync>> call, Response<List<Sync>> response) {
         Log.d(TAG, "onResponse success:" + response.isSuccessful());
-
         if (response.isSuccessful()) {
-
             for (Sync c : response.body()) {
                 syncQueue.add(c);
                 Log.d(TAG, c.toString());
             }
-
-
         }
-
         Iterator<Sync> syncIterator = syncQueue.iterator();
         Log.d(TAG, "Iterating over linked list===============================");
 
         while (syncIterator.hasNext()) {
-//            Log.d(TAG,syncIterator.next().toString());
+
             Sync c = syncIterator.next();
             // get the uuid of the current Sync item
             String uuid = c.getUuid();
@@ -137,31 +131,9 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                         case ACTION_CREATE:
                             Log.d(TAG, "action - create");
                             // create a new record in the local database but first we have to cherry pick the record from the remote api
-
-
                             // get the record from Property table with this uuid...
-                            getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
-
-                            getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
-                                @Override
-                                public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-                                    Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
-                                    if (response.isSuccessful()) {
-                                        for (Property p : response.body()) {
-                                            Log.d(TAG, p.toString());
-                                            // create new property locally as well.
-                                            mPropertyItemDataSource.createPropertyItem(p);
-                                            // refresh the screen with the latest data from the local db...
-                                            MainActivity.getDataFromTheLocalDB();
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<List<Property>> call, Throwable t) {
-                                    Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
-                                }
-                            });
+                            getOrUpdate(uuid, ACTION_CREATE);
+                            Call<List<Property>> getPropByUUIDCall;
                             break;
 
                         case ACTION_DELETE:
@@ -185,27 +157,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
                         case ACTION_UPDATE:
                             Log.d(TAG, "action - update");
                             // get the record from Property table with this uuid...
-                            getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
-                            getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
-                                @Override
-                                public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
-                                    Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
-                                    if (response.isSuccessful()) {
-                                        for (Property p : response.body()) {
-                                            Log.d(TAG, p.toString());
-                                            // create new property locally as well.
-                                            mPropertyItemDataSource.updatePropertyItem(p);
-                                            // refresh the screen with the latest data from the local db...
-                                            MainActivity.getDataFromTheLocalDB();
-                                        }
-                                    }
-                                }
-
-                                @Override
-                                public void onFailure(Call<List<Property>> call, Throwable t) {
-                                    Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
-                                }
-                            });
+                            getOrUpdate(uuid, ACTION_UPDATE);
                             break;
 
                     }
@@ -280,6 +232,37 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
             mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getTimeChanged()).apply();
         }
+    }
+
+    private void getOrUpdate(String uuid, final String action) {
+        Call<List<Property>> getPropByUUIDCall = espcService.getPropertyByUUID(uuid);
+        getPropByUUIDCall.enqueue(new Callback<List<Property>>() {
+            @Override
+            public void onResponse(Call<List<Property>> call, Response<List<Property>> response) {
+                Log.d(TAG, "onResponse success:" + response.isSuccessful() + " getting property by uuid");
+                if (response.isSuccessful()) {
+                    for (Property p : response.body()) {
+                        Log.d(TAG, p.toString());
+                        if(action.equals(ACTION_CREATE)) {
+                            // create new property locally as well.
+                            mPropertyItemDataSource.createPropertyItem(p);
+                        }
+
+                        if(action.equals(ACTION_UPDATE)){
+                            // update local property
+                            mPropertyItemDataSource.updatePropertyItem(p);
+                        }
+                        // refresh the screen with the latest data from the local db...
+                        MainActivity.getDataFromTheLocalDB();
+                    }
+                }
+            }
+
+            @Override
+            public void onFailure(Call<List<Property>> call, Throwable t) {
+                Log.e(TAG, "onFailure error getting property by uuid" + t.toString());
+            }
+        });
     }
 
 
