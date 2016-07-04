@@ -6,7 +6,6 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.content.DialogInterface;
 import android.os.Bundle;
-import android.support.v7.widget.DialogTitle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
@@ -66,7 +65,7 @@ public class UpdateRoomDialog extends DialogFragment {
         View room_dialog_layout = LayoutInflater.from(mParent).inflate(R.layout.room_dialog_layout, null);
         final EditText roomNameEditText = (EditText) room_dialog_layout.findViewById(R.id.newRoomName);
 
-        roomNameEditText.setText(roomToUpdate.getName());
+        roomNameEditText.setText(roomToUpdate.getRoom_column_name());
 
         AlertDialog.Builder ab = new AlertDialog.Builder(mParent)
                 .setTitle(mTitle)

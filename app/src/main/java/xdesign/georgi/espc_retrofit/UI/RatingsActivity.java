@@ -26,11 +26,9 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.UserPropertyRatingsAdapter;
-import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Sync;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
-import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyRatingDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -212,9 +210,9 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     public void onPositiveAddPropertyRating(int selectedValue) {
         final UserPropertyRating newUserPropertyRating = new UserPropertyRating();
-        newUserPropertyRating.setOverallRating(selectedValue);
-        newUserPropertyRating.setUserID(userId);
-        newUserPropertyRating.setPropertyID(propertyId);
+        newUserPropertyRating.setUSERPROPERTYRATING_COLUMN_OVERALLRATING(selectedValue);
+        newUserPropertyRating.setUSERPROPERTYRATING_COLUMN_USERID(userId);
+        newUserPropertyRating.setUSERPROPERTYRATING_COLUMN_PROPERTYID(propertyId);
 
         Call<UserPropertyRating> call = espcService.addNewRating(newUserPropertyRating);
         call.enqueue(new Callback<UserPropertyRating>() {
@@ -248,10 +246,10 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
         // Set up new poroperty rating
         final UserPropertyRating newRating = new UserPropertyRating();
-        newRating.setPropertyID(oldRating.getPropertyID());
-        newRating.setUuid(uuid);
-        newRating.setUserID(oldRating.getUserID());
-        newRating.setOverallRating(selectedValue);
+        newRating.setUSERPROPERTYRATING_COLUMN_PROPERTYID(oldRating.getUserpropertyrating_column_propertyid());
+        newRating.setUSERPROPERTYRATING_COLUMN_UUID(uuid);
+        newRating.setUSERPROPERTYRATING_COLUMN_USERID(oldRating.getUserpropertyrating_column_userid());
+        newRating.setUSERPROPERTYRATING_COLUMN_OVERALLRATING(selectedValue);
         newRating.setId(oldRating.getId());
 
         Call<UserPropertyRating> userPropertyRatingCall = espcService.updatePropertyRatingById(mPropertyRatings.get(propertyToBeUpdatedIndex).getId(), newRating);
@@ -282,10 +280,10 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
 
     private void addSyncToRemote(final int propertyToBeUpdatedIndex, String uuid, long unixTimestamp, final UserPropertyRating newRating) {
         Sync sync = new Sync();
-        sync.setUuid(uuid);
-        sync.setAction("update");
-        sync.setTable("UserPropertyRating");
-        sync.setTimeChanged(unixTimestamp);
+        sync.setSYNC_COLUMN_UUID(uuid);
+        sync.setSYNC_COLUMN_ACTION("update");
+        sync.setSYNC_COLUMN_TABLE("UserPropertyRating");
+        sync.setSYNC_COLUMN_TIMECHANGED(unixTimestamp);
 
         espcService.addNewSync(sync).enqueue(new Callback<Sync>() {
             @Override

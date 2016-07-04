@@ -17,19 +17,19 @@ public class User_ESPC {
         this.id = id;
     }
 
-    public String getName() {
+    public String getUser_espc_column_name() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setUSER_ESPC_COLUMN_NAME(String name) {
         this.name = name;
     }
 
-    public int getPassword() {
+    public int getUser_espc_column_password() {
         return password;
     }
 
-    public void setPassword(int password) {
+    public void setUSER_ESPC_COLUMN_PASSWORD(int password) {
         this.password = password;
     }
 

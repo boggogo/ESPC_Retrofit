@@ -19,7 +19,6 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
@@ -82,7 +81,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         Log.e("MainActivity", "onResponse");
 
         for(User_ESPC u: response.body()){
-            Log.d(TAG,u.getName());
+            Log.d(TAG,u.getUser_espc_column_name());
             // save the user name to the shared preferences
             mEditor.putInt(Constants.USER_ID_KEY,u.getId()).apply();
         }

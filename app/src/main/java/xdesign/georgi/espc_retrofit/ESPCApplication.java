@@ -5,7 +5,6 @@ import android.app.Application;
 import java.util.ArrayList;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
-import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 
 /**
  * Created by georgi on 20/06/16.
@@ -23,15 +22,15 @@ public class ESPCApplication extends Application {
 //
 //        Property p1 = new Property();
 //        p1.setId(0);
-//        p1.setPrice("200.00");
-//        p1.setUserID(8);
-//        p1.setAddress("37 Mock Str. Aberdeen, AB26 UT");
+//        p1.setPROPERTY_COLUMN_PRICE("200.00");
+//        p1.setUSERPROPERTYRATING_COLUMN_USERID(8);
+//        p1.setPROPERTY_COLUMN_ADDRESS("37 Mock Str. Aberdeen, AB26 UT");
 //
 //        Property p2 = new Property();
 //        p2.setId(0);
-//        p2.setPrice("350.00");
-//        p2.setUserID(8);
-//        p2.setAddress("11 St. Mock Str. Edinburgh, EH4");
+//        p2.setPROPERTY_COLUMN_PRICE("350.00");
+//        p2.setUSERPROPERTYRATING_COLUMN_USERID(8);
+//        p2.setPROPERTY_COLUMN_ADDRESS("11 St. Mock Str. Edinburgh, EH4");
 //
 //        preLoadedProperties.add(p1);
 //        preLoadedProperties.add(p2);

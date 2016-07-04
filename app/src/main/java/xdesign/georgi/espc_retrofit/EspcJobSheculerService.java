@@ -19,11 +19,9 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.Backend.Sync;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
-import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 
@@ -117,13 +115,13 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
             Sync c = syncIterator.next();
             // get the uuid of the current Sync item
-            String uuid = c.getUuid();
+            String uuid = c.getSync_column_uuid();
             // Check which table that the change occur in
-            switch (c.getTable()) {
+            switch (c.getSync_column_table()) {
                 case TABLE_PROPERTY:
                     Log.d(TAG, "Table: Property");
 // check what action to do in the local database...
-                    switch (c.getAction()) {
+                    switch (c.getSync_column_action()) {
                         case ACTION_CREATE:
                             Log.d(TAG, "action - create");
                             // create a new record in the local database but first we have to cherry pick the record from the remote api
@@ -148,7 +146,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
                 case TABLE_USER_PROPERTY_RATING:
                     Log.d(TAG, "Table: TABLE_USER_PROPERTY_RATING");
-                    switch (c.getAction()) {
+                    switch (c.getSync_column_action()) {
                         case ACTION_CREATE:
                             createOrUpdateLocally(uuid, ACTION_CREATE, TABLE_USER_PROPERTY_RATING);
                             break;
@@ -167,7 +165,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
 
             }
 
-            mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getTimeChanged()).apply();
+            mEditor.putLong(Constants.LAST_SYNC_TIME_KEY, c.getSync_column_timechanged()).apply();
         }
     }
 
@@ -176,7 +174,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
             case TABLE_PROPERTY:
                 ArrayList<Property> localProperties = mPropertyItemDataSource.getAllPropertyItems();
                 for (Property p : localProperties) {
-                    if (p.getUuid().equals(uuid)) {
+                    if (p.getProperty_column_uuid().equals(uuid)) {
                         // delete it
                         Log.d(TAG, "Deleting property: " + p.toString());
                         mPropertyItemDataSource.deletePropertyItem(p);
@@ -188,7 +186,7 @@ public class EspcJobSheculerService extends JobService implements Callback<List<
             case TABLE_USER_PROPERTY_RATING:
                 ArrayList<UserPropertyRating> userPropertyRatings = mPropertyItemDataSource.getAllUserPropertyRatingItems();
                 for (UserPropertyRating ur : userPropertyRatings) {
-                    if (ur.getUuid().equals(uuid)) {
+                    if (ur.getUserpropertyrating_column_uuid().equals(uuid)) {
                         mPropertyItemDataSource.deleteUserPropertyRatingItem(ur);
                         Log.d(TAG, "Deleting UserPropertyRating: " + ur.toString());
                     }

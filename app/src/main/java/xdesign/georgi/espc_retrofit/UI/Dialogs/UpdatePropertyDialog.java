@@ -10,7 +10,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.EditText;
 
-import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 
@@ -61,8 +60,8 @@ public class UpdatePropertyDialog extends DialogFragment {
         propertyToBeUpdatedIndex = getArguments().getInt(DIALOG_DELETING_PROPERTY_INDEX);
 
 
-        addressEditText.setText(((MainActivity) (mParent)).mProperties.get(propertyToBeUpdatedIndex).getAddress());
-        priceEditText.setText(((MainActivity) (mParent)).mProperties.get(propertyToBeUpdatedIndex).getPrice());
+        addressEditText.setText(((MainActivity) (mParent)).mProperties.get(propertyToBeUpdatedIndex).getProperty_column_address());
+        priceEditText.setText(((MainActivity) (mParent)).mProperties.get(propertyToBeUpdatedIndex).getProperty_column_price());
         AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(getActivity());
         alertDialogBuilder
                 .setTitle(mTitle)

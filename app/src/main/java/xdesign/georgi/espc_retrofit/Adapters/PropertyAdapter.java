@@ -51,8 +51,8 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
     @Override
     public void onBindViewHolder(PropertyViewHolder holder, int position) {
         Property property = mProperties.get(position);
-        holder.propertyAddress.setText(property.getAddress());
-        holder.propertyPrice.setText(property.getPrice() + "");
+        holder.propertyAddress.setText(property.getProperty_column_address());
+        holder.propertyPrice.setText(property.getProperty_column_price() + "");
         holder.propertyRating.setText(getOverallPropertyRatingById(property.getId())+"");
     }
 
@@ -60,8 +60,8 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
         double totalOverAllRating = 0.0;
 
         for(UserPropertyRating upr: mUserPropertyRatings){
-            if(upr.getPropertyID() == id){
-                totalOverAllRating += upr.getOverallRating();
+            if(upr.getUserpropertyrating_column_propertyid() == id){
+                totalOverAllRating += upr.getUserpropertyrating_column_overallrating();
                 Log.d(TAG,"Overall rating total value:-> "+totalOverAllRating + "");
             }
 
@@ -135,7 +135,7 @@ public class PropertyAdapter extends RecyclerView.Adapter<PropertyAdapter.Proper
                     ratingsIntent.putExtra(Constants.KEY_PROPERTY_ID,mProperties.get(propertyPosition).getId());
                     Log.d(TAG,"set the property id to the intent: " + mProperties.get(propertyPosition).getId());
 
-                    ratingsIntent.putExtra(Constants.KEY_PROPERTY_NAME,mProperties.get(propertyPosition).getAddress());
+                    ratingsIntent.putExtra(Constants.KEY_PROPERTY_NAME,mProperties.get(propertyPosition).getProperty_column_address());
                     mParent.startActivity(ratingsIntent);
 
                 default:

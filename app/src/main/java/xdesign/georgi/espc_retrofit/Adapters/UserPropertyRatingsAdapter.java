@@ -45,8 +45,8 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
     @Override
     public void onBindViewHolder(UserPropertyRatingViewHolder holder, int position) {
         UserPropertyRating userPropertyRating = mPropertyRatings.get(position);
-        holder.addedByUserView.setText(getUserNameByUserID(userPropertyRating.getUserID()));
-        holder.mRatingsContainer.setText(userPropertyRating.getOverallRating()+"");
+        holder.addedByUserView.setText(getUserNameByUserID(userPropertyRating.getUserpropertyrating_column_userid()));
+        holder.mRatingsContainer.setText(userPropertyRating.getUserpropertyrating_column_overallrating()+"");
 
 
 
@@ -55,7 +55,7 @@ public class UserPropertyRatingsAdapter extends RecyclerView.Adapter<UserPropert
     private String getUserNameByUserID(int userID) {
         for(User_ESPC u: mUsers){
             if(u.getId() == userID){
-                return u.getName();
+                return u.getUser_espc_column_name();
             }
         }
         return "unknown";

@@ -20,35 +20,35 @@ public class UserPropertyRating implements Serializable {
         this.id = id;
     }
 
-    public String getUuid() {
+    public String getUserpropertyrating_column_uuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setUSERPROPERTYRATING_COLUMN_UUID(String uuid) {
         this.uuid = uuid;
     }
 
-    public int getUserID() {
+    public int getUserpropertyrating_column_userid() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setUSERPROPERTYRATING_COLUMN_USERID(int userID) {
         this.userID = userID;
     }
 
-    public int getPropertyID() {
+    public int getUserpropertyrating_column_propertyid() {
         return propertyID;
     }
 
-    public void setPropertyID(int propertyID) {
+    public void setUSERPROPERTYRATING_COLUMN_PROPERTYID(int propertyID) {
         this.propertyID = propertyID;
     }
 
-    public int getOverallRating() {
+    public int getUserpropertyrating_column_overallrating() {
         return overallRating;
     }
 
-    public void setOverallRating(int overallRating) {
+    public void setUSERPROPERTYRATING_COLUMN_OVERALLRATING(int overallRating) {
         this.overallRating = overallRating;
     }
 

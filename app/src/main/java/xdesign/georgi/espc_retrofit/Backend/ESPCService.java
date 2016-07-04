@@ -1,7 +1,5 @@
 package xdesign.georgi.espc_retrofit.Backend;
 
-import android.content.Intent;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -14,120 +12,118 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
-import retrofit2.http.Query;
 
 public interface ESPCService {
-    //=============================================== Feature Methods =============================================
 
-    /***
-     * Method to get a feature by id
-     *
-     * @param id id of the feature to be returned
-     * @return a Feature object
-     */
-    @GET("Features/{id}")
-    Call<Feature> getFeatureById(@Path("id") int id);
+    @GET("UserRoomRatings")
+    Call<List<UserRoomRating>> getAllUserRoomRatings();
 
-    /***
-     * Method to get all of the features in the Feature table
-     *
-     * @return List of features
-     */
-    @GET("Features/{}")
-    Call<List<Feature>> getAllFeatures();
+    @GET("UserRoomRatings/{id}")
+    Call<UserRoomRating> getUserRoomRatingById(@Path("id") int id);
 
-    //=============================================== Property Methods =============================================
-    @GET("Properties")
-    Call<List<Property>> getAllProperties();
+    @POST("UserRoomRatings")
+    Call<UserRoomRating> addNewUserRoomRating(@Body UserRoomRating userroomrating);
 
-    @GET("Properties")
-    Call<List<Property>> getAllPropertiesAssociatedWithUserId(@Query("filter[where][userID]=") int userID);
+    @PUT("UserRoomRatings/{id}")
+    Call<UserRoomRating> updateUserRoomRatingbyId(@Path("id") int id, @Body UserRoomRating userroomrating);
 
-    // Add new property
-    @POST("Properties")
-    Call<Property> addNewProperty(@Body Property property);
+    @DELETE("UserRoomRatings/{id}")
+    Call<HashMap<String, Integer>> deleteUserRoomRatingById(@Path("id") int id);
 
-    @DELETE("Properties/{id}")
-    Call<HashMap<String, Integer>> deletePropertyById(@Path("id") int id);
+    @GET("UserPropertyRatings")
+    Call<List<UserPropertyRating>> getAllUserPropertyRatings();
 
-    @PUT("Properties/{id}")
-    Call<Property> updatePropertyById(@Path("id") int id, @Body Property property);
+    @GET("UserPropertyRatings/{id}")
+    Call<UserPropertyRating> getUserPropertyRatingById(@Path("id") int id);
 
-    @GET ("Properties/getPropertyByUUID")
-    Call<List<Property>> getPropertyByUUID(@Query(("uuidPr")) String uuid);
+    @POST("UserPropertyRatings")
+    Call<UserPropertyRating> addNewUserPropertyRating(@Body UserPropertyRating userpropertyrating);
 
-    //=============================================== User Methods =============================================
+    @PUT("UserPropertyRatings/{id}")
+    Call<UserPropertyRating> updateUserPropertyRatingbyId(@Path("id") int id, @Body UserPropertyRating userpropertyrating);
+
+    @DELETE("UserPropertyRatings/{id}")
+    Call<HashMap<String, Integer>> deleteUserPropertyRatingById(@Path("id") int id);
+
     @GET("User_ESPCs")
-    Call<List<User_ESPC>> getAllUsers();
+    Call<List<User_ESPC>> getAllUser_ESPCs();
 
-    //http://localhost:3000/api/User_ESPCs?filter[where][name]=admin
-    @GET("User_ESPCs")
-    Call<List<User_ESPC>> getUserByNameAndPass(@Query("filter[where][name]=") String name, @Query("filter[where][password]=") String password);
+    @GET("User_ESPCs/{id}")
+    Call<User_ESPC> getUser_ESPCById(@Path("id") int id);
 
+    @POST("User_ESPCs")
+    Call<User_ESPC> addNewUser_ESPC(@Body User_ESPC user_espc);
 
-    //=============================================== Room Methods =============================================
+    @PUT("User_ESPCs/{id}")
+    Call<User_ESPC> updateUser_ESPCbyId(@Path("id") int id, @Body User_ESPC user_espc);
+
+    @DELETE("User_ESPCs/{id}")
+    Call<HashMap<String, Integer>> deleteUser_ESPCById(@Path("id") int id);
+
+    @GET("Syncs")
+    Call<List<Sync>> getAllSyncs();
+
+    @GET("Syncs/{id}")
+    Call<Sync> getSyncById(@Path("id") int id);
+
+    @POST("Syncs")
+    Call<Sync> addNewSync(@Body Sync sync);
+
+    @PUT("Syncs/{id}")
+    Call<Sync> updateSyncbyId(@Path("id") int id, @Body Sync sync);
+
+    @DELETE("Syncs/{id}")
+    Call<HashMap<String, Integer>> deleteSyncById(@Path("id") int id);
+
     @GET("Rooms")
-    Call<List<Room>> getAllRoomsAssociatedWithPropertyID(@Query("filter[where][propertyID]=") int propertyID);
+    Call<List<Room>> getAllRooms();
 
-    @DELETE("Rooms/{id}")
-    Call<HashMap<String, Integer>> deleteRoomById(@Path("id") int id);
+    @GET("Rooms/{id}")
+    Call<Room> getRoomById(@Path("id") int id);
 
     @POST("Rooms")
     Call<Room> addNewRoom(@Body Room room);
 
     @PUT("Rooms/{id}")
-    Call<Room> updateRoomById(@Path("id") int id, @Body Room room);
+    Call<Room> updateRoombyId(@Path("id") int id, @Body Room room);
 
-    //=============================================== UserPropertyRating Methods =============================================
-    @GET("UserPropertyRatings")
-    Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithUserId(@Query(("filter[where][userID]=")) int userID);
+    @DELETE("Rooms/{id}")
+    Call<HashMap<String, Integer>> deleteRoomById(@Path("id") int id);
 
-    @GET("UserPropertyRatings")
-    Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithPropId(@Query(("filter[where][propertyID]=")) int propertyID);
+    @GET("Propertys")
+    Call<List<Property>> getAllPropertys();
 
-    @GET("UserPropertyRatings")
-    Call<List<UserPropertyRating>> getAllUserPropertyRatings();
+    @GET("Propertys/{id}")
+    Call<Property> getPropertyById(@Path("id") int id);
 
-    @POST("UserPropertyRatings")
-    Call<UserPropertyRating> addNewRating(@Body UserPropertyRating userPropertyRating);
+    @POST("Propertys")
+    Call<Property> addNewProperty(@Body Property property);
 
-    @PUT("UserPropertyRatings/{id}")
-    Call<UserPropertyRating> updatePropertyRatingById(@Path("id") int id, @Body UserPropertyRating userPropertyRating);
+    @PUT("Propertys/{id}")
+    Call<Property> updatePropertybyId(@Path("id") int id, @Body Property property);
 
-    @DELETE("UserPropertyRatings/{id}")
-    Call<HashMap<String, Integer>> deletePropertyRatingById(@Path("id") int id);
+    @DELETE("Propertys/{id}")
+    Call<HashMap<String, Integer>> deletePropertyById(@Path("id") int id);
 
-    @GET ("UserPropertyRatings/getUserPropertyRatingByUUID")
-    Call<List<UserPropertyRating>> getUserPropertyRatingByUUID(@Query(("uuidPr")) String uuid);
+    @GET("Features")
+    Call<List<Feature>> getAllFeatures();
 
-    //=============================================== Sync Methods =============================================
-    @GET("Syncs")
-    Call<List<Sync>> getAllSyncs();
+    @GET("Features/{id}")
+    Call<Feature> getFeatureById(@Path("id") int id);
 
-    @GET("Syncs/getRecodsAfterTimestamp")
-    Call<List<Sync>> getAllSyncsAfterThisTimeStamp(@Query(("timeChanged")) long timeChanged);
+    @POST("Features")
+    Call<Feature> addNewFeature(@Body Feature feature);
 
-    // Add new sync record
-    @POST("Syncs")
-    Call<Sync> addNewSync(@Body Sync s);
+    @PUT("Features/{id}")
+    Call<Feature> updateFeaturebyId(@Path("id") int id, @Body Feature feature);
 
-
+    @DELETE("Features/{id}")
+    Call<HashMap<String, Integer>> deleteFeatureById(@Path("id") int id);
 
 
-
-
-
-
-
-
-
-
-
-    //=============================================== Backend Base URL =============================================
     public static final Retrofit retrofit = new Retrofit.Builder()
             .baseUrl("http://10.0.2.2:3000/api/")
             .addConverterFactory(GsonConverterFactory.create())
             .build();
-
 
 }

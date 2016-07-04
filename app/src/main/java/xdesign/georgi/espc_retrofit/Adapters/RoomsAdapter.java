@@ -42,7 +42,7 @@ public class RoomsAdapter extends RecyclerView.Adapter<RoomsAdapter.RoomViewHold
     @Override
     public void onBindViewHolder(RoomViewHolder holder, int position) {
         Room room = mRooms.get(position);
-        holder.roomName.setText(room.getName());
+        holder.roomName.setText(room.getRoom_column_name());
     }
 
     @Override

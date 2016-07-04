@@ -1,11 +1,9 @@
 package xdesign.georgi.espc_retrofit.UI;
 
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.graphics.drawable.DrawableCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
@@ -24,9 +22,7 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
-import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
 import xdesign.georgi.espc_retrofit.Adapters.RoomsAdapter;
-import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.Backend.Room;
 import xdesign.georgi.espc_retrofit.R;
@@ -78,7 +74,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
 
     private void getAllPropertyRooms() {
 
-        getSupportActionBar().setTitle(property.getAddress());
+        getSupportActionBar().setTitle(property.getProperty_column_address());
         Log.d(TAG, property.toString());
 
         Call<List<Room>> propertyRooms = espcService.getAllRoomsAssociatedWithPropertyID(property.getId());
@@ -157,8 +153,8 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
     public void onPositiveAddNewRoom(String newRoomName) {
         // Add new Room dialog here
         Room newRoom = new Room();
-        newRoom.setPropertyID(property.getId());
-        newRoom.setName(newRoomName);
+        newRoom.setROOM_COLUMN_PROPERTYID(property.getId());
+        newRoom.setROOM_COLUMN_NAME(newRoomName);
 
         espcService.addNewRoom(newRoom).enqueue(new Callback<Room>() {
             @Override
@@ -181,8 +177,8 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
     public void onPositiveUpdateRoom(final Room roomToUpdate, String newRoomName) {
         final Room newRoom = new Room();
         newRoom.setId(roomToUpdate.getId());
-        newRoom.setName(newRoomName);
-        newRoom.setPropertyID(roomToUpdate.getPropertyID());
+        newRoom.setROOM_COLUMN_NAME(newRoomName);
+        newRoom.setROOM_COLUMN_PROPERTYID(roomToUpdate.getRoom_column_propertyid());
 
         espcService.updateRoomById(roomToUpdate.getId(), newRoom).enqueue(new Callback<Room>() {
             @Override

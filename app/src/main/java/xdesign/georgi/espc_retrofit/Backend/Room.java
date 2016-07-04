@@ -18,19 +18,19 @@ public class Room implements Serializable {
         this.id = id;
     }
 
-    public int getPropertyID() {
+    public int getRoom_column_propertyid() {
         return propertyID;
     }
 
-    public void setPropertyID(int propertyID) {
+    public void setROOM_COLUMN_PROPERTYID(int propertyID) {
         this.propertyID = propertyID;
     }
 
-    public String getName() {
+    public String getRoom_column_name() {
         return name;
     }
 
-    public void setName(String name) {
+    public void setROOM_COLUMN_NAME(String name) {
         this.name = name;
     }
 

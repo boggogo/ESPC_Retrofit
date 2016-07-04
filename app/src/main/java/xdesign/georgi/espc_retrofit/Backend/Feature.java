@@ -7,23 +7,32 @@ public class Feature {
         private String name;
         private int roomID;
 
-        public String getName() {
+        public String getFeature_column_name() {
             return name;
         }
 
-        public void setName(String name) {
+        public void setFEATURE_COLUMN_NAME(String name) {
             this.name = name;
         }
 
-        public int getRoomID() {
+        public int getFeature_column_roomid() {
             return roomID;
         }
 
-        public void setRoomID(int roomID) {
+        public void setFEATURE_COLUMN_ROOMID(int roomID) {
             this.roomID = roomID;
         }
 
-        @Override
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    @Override
         public String toString() {
             return "Feature{" +
                     "name='" + name + '\'' +

@@ -28,7 +28,6 @@ import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.sql.Time;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -40,7 +39,6 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.PropertyAdapter;
-import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.EspcJobSheculerService;
@@ -261,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     public void onRefresh() {
 //        if(isWifiAwailable()){
 //            int jobID = 2;
-//            JobInfo.Builder builder = new JobInfo.Builder(jobID, new ComponentName(getPackageName(), EspcJobSheculerService.class.getName()));
+//            JobInfo.Builder builder = new JobInfo.Builder(jobID, new ComponentName(getPackageName(), EspcJobSheculerService.class.getUser_espc_column_name()));
 //            builder.set
 //            JobInfo oneTimeJobInfo = builder.build();
 //            mJobScheduler.schedule(oneTimeJobInfo);
@@ -277,10 +275,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "onPositiveAddNewProperty: address: " + address + " Price: " + price);
         // set up the new property...
         final Property newProperty = new Property();
-        newProperty.setAddress(address);
-        newProperty.setPrice(price);
-        newProperty.setLastUpdated(getTimeStamp());
-        newProperty.setUserID(userId);
+        newProperty.setPROPERTY_COLUMN_ADDRESS(address);
+        newProperty.setPROPERTY_COLUMN_PRICE(price);
+        newProperty.setPROPERTY_COLUMN_LASTUPDATED(getTimeStamp());
+        newProperty.setPROPERTY_COLUMN_USERID(userId);
         // start refreshing...
         mRefreshLayout.setRefreshing(true);
 
@@ -335,7 +333,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     public void onPositiveDeletePropertyById(final Property property) {
         // Check if the user can delete this property - e.g. the user addded it
-        if (property.getUserID() == userId) {
+        if (property.getProperty_column_userid() == userId) {
             Call<HashMap<String, Integer>> call = espcService.deletePropertyById(property.getId());
             call.enqueue(new Callback<HashMap<String, Integer>>() {
                 @Override
@@ -402,13 +400,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         final Property newProp = new Property();
-        newProp.setAddress(newPropAddress);
-        newProp.setPrice(newPropPrice);
-        newProp.setLastUpdated(getTimeStamp());
+        newProp.setPROPERTY_COLUMN_ADDRESS(newPropAddress);
+        newProp.setPROPERTY_COLUMN_PRICE(newPropPrice);
+        newProp.setPROPERTY_COLUMN_LASTUPDATED(getTimeStamp());
         newProp.setId(oldProp.getId());
-        newProp.setUserID(userId);
+        newProp.setPROPERTY_COLUMN_USERID(userId);
 
-        if (mProperties.get(propertyToBeUpdatedIndex).getUserID() == userId) {
+        if (mProperties.get(propertyToBeUpdatedIndex).getProperty_column_userid() == userId) {
             // get the property id that will be updated in the backend
 
             mProperties.set(propertyToBeUpdatedIndex, newProp);

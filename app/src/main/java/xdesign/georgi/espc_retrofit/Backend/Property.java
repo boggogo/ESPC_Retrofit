@@ -15,24 +15,24 @@ public class Property implements Serializable{
     private int id;
     private int userID;
     private String address;
-    private String price;
+    private int price;
     private String lastUpdated;
     private String uuid;
 
 
-    public String getUuid() {
+    public String getProperty_column_uuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setPROPERTY_COLUMN_UUID(String uuid) {
         this.uuid = uuid;
     }
 
-    public int getUserID() {
+    public int getProperty_column_userid() {
         return userID;
     }
 
-    public void setUserID(int userID) {
+    public void setPROPERTY_COLUMN_USERID(int userID) {
         this.userID = userID;
     }
 
@@ -44,27 +44,27 @@ public class Property implements Serializable{
         this.id = id;
     }
 
-    public String getAddress() {
+    public String getProperty_column_address() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setPROPERTY_COLUMN_ADDRESS(String address) {
         this.address = address;
     }
 
-    public String getPrice() {
+    public int getProperty_column_price() {
         return price;
     }
 
-    public void setPrice(String price) {
+    public void setPROPERTY_COLUMN_PRICE(int price) {
         this.price = price;
     }
 
-    public String getLastUpdated() {
+    public String getProperty_column_lastupdated() {
         return lastUpdated;
     }
 
-    public void setLastUpdated(String lastUpdated) {
+    public void setPROPERTY_COLUMN_LASTUPDATED(String lastUpdated) {
         this.lastUpdated = lastUpdated;
     }
 

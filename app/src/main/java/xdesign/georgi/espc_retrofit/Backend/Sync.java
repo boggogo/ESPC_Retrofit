@@ -1,7 +1,5 @@
 package xdesign.georgi.espc_retrofit.Backend;
 
-import java.util.Objects;
-
 /**
  * Created by georgi on 22/06/16.
  */
@@ -21,41 +19,41 @@ public class Sync {
         this.id = id;
     }
 
-    public String getUuid() {
+    public String getSync_column_uuid() {
         return uuid;
     }
 
-    public void setUuid(String uuid) {
+    public void setSYNC_COLUMN_UUID(String uuid) {
         this.uuid = uuid;
     }
 
-    public String getTable() {
+    public String getSync_column_table() {
         return table;
     }
 
-    public void setTable(String table) {
+    public void setSYNC_COLUMN_TABLE(String table) {
         this.table = table;
     }
 
-    public String getAction() {
+    public String getSync_column_action() {
         return action;
     }
 
-    public void setAction(String action) {
+    public void setSYNC_COLUMN_ACTION(String action) {
         this.action = action;
     }
 
-    public long getTimeChanged() {
+    public long getSync_column_timechanged() {
         return timeChanged;
     }
 
-    public void setTimeChanged(long timeChanged) {
+    public void setSYNC_COLUMN_TIMECHANGED(long timeChanged) {
         this.timeChanged = timeChanged;
     }
 
     @Override
     public String toString() {
-        return "id: " + getId() + " uuid: " + getUuid() + " table: " + getTable() + " action: " + getAction() + " timeStamp: " + getTimeChanged();
+        return "id: " + getId() + " uuid: " + getSync_column_uuid() + " table: " + getSync_column_table() + " action: " + getSync_column_action() + " timeStamp: " + getSync_column_timechanged();
     }
 
 //    public boolean equals(Object o) {
