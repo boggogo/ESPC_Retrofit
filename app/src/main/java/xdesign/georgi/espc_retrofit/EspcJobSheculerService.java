@@ -19,9 +19,11 @@ import java.util.List;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
+import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.Backend.Sync;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
+import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.UI.MainActivity;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
 

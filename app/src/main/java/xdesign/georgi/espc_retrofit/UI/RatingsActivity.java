@@ -26,9 +26,11 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.UserPropertyRatingsAdapter;
+import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Sync;
 import xdesign.georgi.espc_retrofit.Backend.UserPropertyRating;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
+import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 import xdesign.georgi.espc_retrofit.R;
 import xdesign.georgi.espc_retrofit.UI.Dialogs.AddNewPropertyRatingDialog;
 import xdesign.georgi.espc_retrofit.Utils.Constants;
@@ -214,7 +216,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         newUserPropertyRating.setUSERPROPERTYRATING_COLUMN_USERID(userId);
         newUserPropertyRating.setUSERPROPERTYRATING_COLUMN_PROPERTYID(propertyId);
 
-        Call<UserPropertyRating> call = espcService.addNewRating(newUserPropertyRating);
+        Call<UserPropertyRating> call = espcService.addNewUserPropertyRating(newUserPropertyRating);
         call.enqueue(new Callback<UserPropertyRating>() {
             @Override
             public void onResponse(Call<UserPropertyRating> call, Response<UserPropertyRating> response) {
@@ -252,7 +254,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
         newRating.setUSERPROPERTYRATING_COLUMN_OVERALLRATING(selectedValue);
         newRating.setId(oldRating.getId());
 
-        Call<UserPropertyRating> userPropertyRatingCall = espcService.updatePropertyRatingById(mPropertyRatings.get(propertyToBeUpdatedIndex).getId(), newRating);
+        Call<UserPropertyRating> userPropertyRatingCall = espcService.updateUserPropertyRatingbyId(mPropertyRatings.get(propertyToBeUpdatedIndex).getId(), newRating);
         userPropertyRatingCall.enqueue(new Callback<UserPropertyRating>() {
             @Override
             public void onResponse(Call<UserPropertyRating> call, Response<UserPropertyRating> response) {
@@ -306,7 +308,7 @@ public class RatingsActivity extends AppCompatActivity implements Callback<List<
     public void onPositiveDeletePropertyRatingById(UserPropertyRating propertyRatingToDelete) {
         final UserPropertyRating ratingToDelete = propertyRatingToDelete;
 
-        espcService.deletePropertyRatingById(ratingToDelete.getId()).enqueue(new Callback<HashMap<String, Integer>>() {
+        espcService.deleteUserPropertyRatingById(ratingToDelete.getId()).enqueue(new Callback<HashMap<String, Integer>>() {
             @Override
             public void onResponse(Call<HashMap<String, Integer>> call, Response<HashMap<String, Integer>> response) {
                 if(response.isSuccessful()){

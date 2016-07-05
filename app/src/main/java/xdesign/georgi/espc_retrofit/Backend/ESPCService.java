@@ -12,6 +12,8 @@ import retrofit2.http.GET;
 import retrofit2.http.POST;
 import retrofit2.http.PUT;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
+
 
 public interface ESPCService {
 
@@ -90,8 +92,32 @@ public interface ESPCService {
     @DELETE("Rooms/{id}")
     Call<HashMap<String, Integer>> deleteRoomById(@Path("id") int id);
 
-    @GET("Propertys")
+    @GET("Properties")
+    Call<List<Property>> getAllPropertiesAssociatedWithUserId(@Query("filter[where][userID]=") int userID);
+
+    @GET("UserPropertyRatings")
+    Call<List<UserPropertyRating>> getAllPropRatingsAssociatedWithPropId(@Query(("filter[where][propertyID]=")) int propertyID);
+
+    @GET("Properties")
     Call<List<Property>> getAllPropertys();
+
+    @GET("User_ESPCs")
+    Call<List<User_ESPC>> getAllUsers();
+
+    @GET("Syncs/getRecodsAfterTimestamp")
+    Call<List<Sync>> getAllSyncsAfterThisTimeStamp(@Query(("timeChanged")) long timeChanged);
+
+    @GET("Properties/getPropertyByUUID")
+    Call<List<Property>> getPropertyByUUID(@Query(("uuidPr")) String uuid);
+
+    @GET("UserPropertyRatings/getUserPropertyRatingByUUID")
+    Call<List<UserPropertyRating>> getUserPropertyRatingByUUID(@Query(("uuidPr")) String uuid);
+
+    @GET("User_ESPCs")
+    Call<List<User_ESPC>> getUserByNameAndPass(@Query("filter[where][name]=") String name, @Query("filter[where][password]=") String password);
+
+    @GET("Rooms")
+    Call<List<Room>> getAllRoomsAssociatedWithPropertyID(@Query("filter[where][propertyID]=") int propertyID);
 
     @GET("Propertys/{id}")
     Call<Property> getPropertyById(@Path("id") int id);

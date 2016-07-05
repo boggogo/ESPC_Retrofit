@@ -122,7 +122,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         mAdapter = new PropertyAdapter(this, mProperties, mPropertyUserRatings);
-
         getDataFromTheLocalDB();
 
         mRecyclerView = (RecyclerView) findViewById(R.id.listView);
@@ -140,7 +139,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.d(TAG, "List size: " + mProperties.size());
 
         mAdapter.notifyDataSetChanged();
-        if(mPropertyItemDataSource != null){
+        if (mPropertyItemDataSource != null) {
             mPropertyItemDataSource.open();
         }
     }
@@ -164,7 +163,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private void refetchPropertiesFromBackend() {
         mProperties.clear();
         mPropertyUserRatings.clear();
-        Call<List<Property>> call = espcService.getAllProperties();
+        Call<List<Property>> call = espcService.getAllPropertys();
         call.enqueue(this);
     }
 
@@ -255,7 +254,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         return super.onOptionsItemSelected(item);
     }
 
-//    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    //    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     public void onRefresh() {
 //        if(isWifiAwailable()){
@@ -268,7 +267,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            mRefreshLayout.setRefreshing(false);
 //        }else {
 //            Toast.makeText(this,"No connection! Reading from local db...", Toast.LENGTH_LONG).show();
-            getDataFromTheLocalDB();
+        getDataFromTheLocalDB();
 //        }
     }
 
@@ -277,52 +276,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         // set up the new property...
         final Property newProperty = new Property();
         newProperty.setPROPERTY_COLUMN_ADDRESS(address);
-        newProperty.setPROPERTY_COLUMN_PRICE(price);
+        newProperty.setPROPERTY_COLUMN_PRICE(Integer.parseInt(price));
         newProperty.setPROPERTY_COLUMN_LASTUPDATED(getTimeStamp());
         newProperty.setPROPERTY_COLUMN_USERID(userId);
         // start refreshing...
         mRefreshLayout.setRefreshing(true);
 
-//        mAdapter.notifyDataSetChanged();
-//        // save the new property to the backend...
-//        espcService.addNewProperty(newProperty).enqueue(new Callback<Property>() {
-//            @Override
-//            public void onResponse(Call<Property> call, Response<Property> response) {
-//
-//                if (response.isSuccessful() || response.body() != null) {
-//                    // add the new property locally first...
+
         mProperties.add(newProperty);
         mPropertyItemDataSource.createPropertyItem(newProperty);
         mRefreshLayout.setRefreshing(false);
         isUpdatePending = true;
-        // refetch data from the backend (to get the new ids and delete with work at this point)
-//                    refetchPropertiesFromBackend();
-//
-//                    mRefreshLayout.setRefreshing(false);
-//                    Log.e(TAG, "onResponse: Success: " + response.isSuccessful());
-//                    Toast.makeText(context, "Successfully added new property", Toast.LENGTH_SHORT).show();
-//
-//
-//                } else {
-//                    showErrorToast(getString(R.string.error_add_new_property_toast_message));
-//                }
-//
+
         mAdapter.notifyDataSetChanged();
-//                mRefreshLayout.setRefreshing(false);
-//
-////                if(mProperties.size() == 0){
-////                    mEmptyTextView.setVisibility(View.VISIBLE);
-////                }
-//            }
-//
-//
-//            @Override
-//            public void onFailure(Call<Property> call, Throwable t) {
-//                mRefreshLayout.setRefreshing(false);
-//                Log.e(TAG, "onFailure: error: " + t.toString());
-//                showErrorToast(getString(R.string.error_add_new_property_toast_message));
-//            }
-//        });
 
     }
 
@@ -402,7 +368,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         final Property newProp = new Property();
         newProp.setPROPERTY_COLUMN_ADDRESS(newPropAddress);
-        newProp.setPROPERTY_COLUMN_PRICE(newPropPrice);
+        newProp.setPROPERTY_COLUMN_PRICE(Integer.parseInt(newPropPrice));
         newProp.setPROPERTY_COLUMN_LASTUPDATED(getTimeStamp());
         newProp.setId(oldProp.getId());
         newProp.setPROPERTY_COLUMN_USERID(userId);
@@ -419,8 +385,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    private boolean isWifiAwailable(){
-        ConnectivityManager cm = (ConnectivityManager)getSystemService(Context.CONNECTIVITY_SERVICE);
+    private boolean isWifiAwailable() {
+        ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 
         NetworkInfo activeNetwork = cm.getActiveNetworkInfo();
         return (activeNetwork != null &&

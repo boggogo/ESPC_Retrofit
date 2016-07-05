@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
+import java.util.ArrayList;
 
 import xdesign.georgi.espc_retrofit.Backend.Feature;
 import xdesign.georgi.espc_retrofit.Backend.Property;
@@ -15,7 +18,7 @@ import xdesign.georgi.espc_retrofit.Backend.UserRoomRating;
 import xdesign.georgi.espc_retrofit.Backend.User_ESPC;
 
 public class EspcItemDataSource {
-
+    private String TAG = EspcItemDataSource.class.getSimpleName();
     private SQLiteDatabase mDatabase;
     private Context mContext;
     private EspcSQLiteHelper mDbHelper;
@@ -431,6 +434,58 @@ public class EspcItemDataSource {
         propertyItem.setPROPERTY_COLUMN_LASTUPDATED(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_LASTUPDATED)));
         propertyItem.setPROPERTY_COLUMN_ADDRESS(cursor.getString(cursor.getColumnIndex(EspcSQLiteHelper.PROPERTY_COLUMN_ADDRESS)));
         return propertyItem;
+    }
+
+    public ArrayList<Property> getAllPropertyItems() {
+        ArrayList<Property> properties = new ArrayList<>();
+        Cursor cursor = mDatabase.query(EspcSQLiteHelper.PROPERTY_TABLE_NAME, allPropertyCollumns, null,
+                null, null, null, null);
+        if (cursor != null && cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                properties.add(generatePropertyObjectFromCursor(cursor));
+
+                cursor.moveToNext();
+            }
+
+            cursor.close();
+        }
+        return properties;
+    }
+
+    public void deleteAll() {
+        mDatabase.delete(EspcSQLiteHelper.PROPERTY_TABLE_NAME, null, null);
+    }
+
+    public ArrayList<UserPropertyRating> getAllPropertyRatingsAssociatedWithPropertyId(int propertyId) {
+        ArrayList<UserPropertyRating> userPropertyRatingsWithId = new ArrayList<>();
+
+        for (UserPropertyRating ups : getAllUserPropertyRatingItems()) {
+            if (ups.getId() == propertyId) {
+                userPropertyRatingsWithId.add(ups);
+            }
+        }
+
+        return userPropertyRatingsWithId;
+    }
+
+    public ArrayList<UserPropertyRating> getAllUserPropertyRatingItems() {
+        Log.d(TAG, "Getting all user property ratings from the database...");
+        //temporary list of RssItems
+        ArrayList<UserPropertyRating> userPropertyRatingsItems = new ArrayList<>();
+        //cursor object to store the result of the query
+        Cursor cursor = mDatabase.query(EspcSQLiteHelper.USERPROPERTYRATING_TABLE_NAME, allUserPropertyRatingCollumns, null,
+                null, null, null, null);
+        //iterate through the cursor
+        if (cursor != null && cursor.moveToFirst()) {
+            while (!cursor.isAfterLast()) {
+                userPropertyRatingsItems.add(generateUserPropertyRatingObjectFromCursor(cursor));
+                cursor.moveToNext();
+            }
+            //close the cursor object
+            cursor.close();
+        }
+        //return the list of rssItems
+        return userPropertyRatingsItems;
     }
 
     public Feature getFeatureItemById(int id) {

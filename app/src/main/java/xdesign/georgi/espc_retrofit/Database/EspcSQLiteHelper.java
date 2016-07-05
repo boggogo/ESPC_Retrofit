@@ -65,7 +65,7 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
             + SYNC_COLUMN_ACTION + " text, "
             + SYNC_COLUMN_TABLE + " text, "
             + SYNC_COLUMN_UUID + " text, "
-            + SYNC_COLUMN_TIMECHANGED + " integer); ";
+            + SYNC_COLUMN_TIMECHANGED + " integer ); ";
 
 
     public static final String ROOM_TABLE_NAME = "Room";
@@ -120,7 +120,7 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
         database.execSQL(USERROOMRATING_CREATE);
         database.execSQL(USERPROPERTYRATING_CREATE);
         database.execSQL(USER_ESPC_CREATE);
-        database.execSQL(SYNC_CREATE);
+//    not needed ATM    database.execSQL(SYNC_CREATE);
         database.execSQL(ROOM_CREATE);
         database.execSQL(PROPERTY_CREATE);
         database.execSQL(FEATURE_CREATE);
@@ -129,7 +129,6 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-
         db.execSQL("DROP TABLE IF EXISTS " + USERROOMRATING_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + USERPROPERTYRATING_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + USER_ESPC_TABLE_NAME);
@@ -138,7 +137,6 @@ public class EspcSQLiteHelper extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + PROPERTY_TABLE_NAME);
         db.execSQL("DROP TABLE IF EXISTS " + FEATURE_TABLE_NAME);
         onCreate(db);
-
     }
 
 

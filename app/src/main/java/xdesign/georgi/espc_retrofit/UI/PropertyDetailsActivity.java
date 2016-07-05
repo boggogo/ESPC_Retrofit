@@ -23,6 +23,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 import xdesign.georgi.espc_retrofit.Adapters.RoomsAdapter;
+import xdesign.georgi.espc_retrofit.Backend.ESPCService;
 import xdesign.georgi.espc_retrofit.Backend.Property;
 import xdesign.georgi.espc_retrofit.Backend.Room;
 import xdesign.georgi.espc_retrofit.R;
@@ -180,7 +181,7 @@ public class PropertyDetailsActivity extends AppCompatActivity implements SwipeR
         newRoom.setROOM_COLUMN_NAME(newRoomName);
         newRoom.setROOM_COLUMN_PROPERTYID(roomToUpdate.getRoom_column_propertyid());
 
-        espcService.updateRoomById(roomToUpdate.getId(), newRoom).enqueue(new Callback<Room>() {
+        espcService.updateRoombyId(roomToUpdate.getId(), newRoom).enqueue(new Callback<Room>() {
             @Override
             public void onResponse(Call<Room> call, Response<Room> response) {
                 Log.d(TAG, "onResponse update room: success: " + response.isSuccessful());

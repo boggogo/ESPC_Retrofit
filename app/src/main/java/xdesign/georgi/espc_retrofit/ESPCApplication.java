@@ -5,6 +5,7 @@ import android.app.Application;
 import java.util.ArrayList;
 
 import xdesign.georgi.espc_retrofit.Backend.Property;
+import xdesign.georgi.espc_retrofit.Database.EspcItemDataSource;
 
 /**
  * Created by georgi on 20/06/16.
